@@ -20,18 +20,17 @@
 		<Title>Camera and Barcode encode/decode pluging for .NET MAUI Apps</Title>
 		<Description>A Camera View control and a Barcode Endode/Decode control (based on ZXing.Net) for .NET MAUI applications.</Description>
 		<Copyright></Copyright>
-		<PackageProjectUrl>https://github.com/hjam40/Camera.MAUI</PackageProjectUrl>
+		<PackageId>CameraMaui</PackageId>
+		<PackageProjectUrl>https://github.com/janusw/Camera.Maui</PackageProjectUrl>
 		<PackageIcon>camera.maui.png</PackageIcon>
 		<PackageReadmeFile>Readme.md</PackageReadmeFile>
-		<RepositoryUrl>https://github.com/hjam40/Camera.MAUI</RepositoryUrl>
+		<RepositoryUrl>https://github.com/janusw/Camera.Maui</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>csharp; dotnet; cross-platform; camera; cameraview; codebar; qr; qr-decoder; codebar-encoder; codebar-decoder; camera-component; camera-view;  plugin; maui; dotnet-maui;</PackageTags>
 		<Authors>hjam40</Authors>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-		<Version>1.4.4</Version>
-		<PackageReleaseNotes>Fix problems with Android rotate device.  Fix iOS problems.
-</PackageReleaseNotes>
+		<Version>1.4.5</Version>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(TargetFramework)'=='net7.0-ios'">
