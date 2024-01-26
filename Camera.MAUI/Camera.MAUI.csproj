@@ -51,6 +51,11 @@
 	  </None>
 	</ItemGroup>
 
+	<ItemGroup Condition="$(TargetFramework.StartsWith('net8.0'))">
+		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
+	</ItemGroup>
+
 	<ItemGroup>
 	  <PackageReference Include="ZXing.Net" Version="0.16.9" />
 	</ItemGroup>
