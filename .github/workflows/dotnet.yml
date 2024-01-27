@@ -12,10 +12,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
 
+  winBuild:
     runs-on: windows-latest
-
     steps:
     - uses: actions/checkout@v3
     - name: Setup .NET
@@ -36,5 +35,26 @@ jobs:
       with:
         name: nupkg
         path: ./Camera.MAUI/bin/Release/*.nupkg
+    - name: Build Test
+      run: dotnet build Camera.MAUI.Test/Camera.MAUI.Test.csproj --no-restore -c Release
+
+  macBuild:
+    runs-on: macos-13
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+    - name: Setup XCode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '15'
+    - name: Restore workloads & dependencies
+      run: |
+        dotnet workload restore
+        dotnet restore
+    - name: Build Lib
+      run: dotnet build Camera.MAUI/Camera.MAUI.csproj --no-restore -c Release
     - name: Build Test
       run: dotnet build Camera.MAUI.Test/Camera.MAUI.Test.csproj --no-restore -c Release
