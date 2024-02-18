@@ -146,7 +146,7 @@ internal class MauiCameraView: GridLayout
         }
     }
 
-    internal async Task<CameraResult> StartRecordingAsync(string file, Microsoft.Maui.Graphics.Size Resolution)
+    internal async Task<CameraResult> StartRecordingAsync(string file, Microsoft.Maui.Graphics.Size Resolution, int frameRate, int bitRate)
     {
         var result = CameraResult.Success;
         if (initiated && !recording)
@@ -178,8 +178,8 @@ internal class MauiCameraView: GridLayout
                         mediaRecorder.SetVideoSource(VideoSource.Surface);
                         mediaRecorder.SetOutputFormat(OutputFormat.Mpeg4);
                         mediaRecorder.SetOutputFile(file);
-                        mediaRecorder.SetVideoEncodingBitRate(10000000);
-                        mediaRecorder.SetVideoFrameRate(30);
+                        mediaRecorder.SetVideoEncodingBitRate(bitRate);
+                        mediaRecorder.SetVideoFrameRate(frameRate);
 
                         var maxVideoSize = ChooseMaxVideoSize(map.GetOutputSizes(Class.FromType(typeof(ImageReader))));
                         if (Resolution.Width != 0 && Resolution.Height != 0)

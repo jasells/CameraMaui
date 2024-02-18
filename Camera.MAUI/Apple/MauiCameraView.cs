@@ -113,7 +113,7 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
             }
         }
     }
-    public async Task<CameraResult> StartRecordingAsync(string file, Size Resolution)
+    public async Task<CameraResult> StartRecordingAsync(string file, Size Resolution, int frameRate, int bitRate)
     {
         CameraResult result = CameraResult.Success;
         if (initiated)

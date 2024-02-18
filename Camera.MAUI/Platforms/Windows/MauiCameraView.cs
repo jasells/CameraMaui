@@ -173,7 +173,7 @@ public sealed partial class MauiCameraView : UserControl, IDisposable
             }
         }
     }
-    internal async Task<CameraResult> StartRecordingAsync(string file, Size Resolution)
+    internal async Task<CameraResult> StartRecordingAsync(string file, Size Resolution, int frameRate, int bitRate)
     {
         CameraResult result = CameraResult.Success;
 
