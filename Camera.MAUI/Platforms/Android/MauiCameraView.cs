@@ -176,7 +176,27 @@ internal class MauiCameraView: GridLayout
                         audioManager.Mode = Mode.Normal;
                         mediaRecorder.SetAudioSource(AudioSource.Mic);
                         mediaRecorder.SetVideoSource(VideoSource.Surface);
-                        mediaRecorder.SetOutputFormat(OutputFormat.Mpeg4);
+                        var ext = System.IO.Path.GetExtension(file).ToLower();
+                        switch (ext)
+                        {
+                            case ".3gp":
+                                mediaRecorder.SetOutputFormat(OutputFormat.ThreeGpp);
+                                mediaRecorder.SetVideoEncoder(VideoEncoder.H264);
+                                mediaRecorder.SetAudioEncoder(AudioEncoder.Aac);
+                                break;
+                            case ".mp4":
+                                mediaRecorder.SetOutputFormat(OutputFormat.Mpeg4);
+                                mediaRecorder.SetVideoEncoder(VideoEncoder.H264);
+                                mediaRecorder.SetAudioEncoder(AudioEncoder.Aac);
+                                break;
+                            case ".webm":
+                                mediaRecorder.SetOutputFormat(OutputFormat.Webm);
+                                mediaRecorder.SetVideoEncoder(VideoEncoder.Vp8);
+                                mediaRecorder.SetAudioEncoder(AudioEncoder.Vorbis);
+                                break;
+                            default:
+                                throw new ArgumentException($"Invalid file extension '{ext}'! Please use '.3gp', '.mp4' or '.webm'!");
+                        }
                         mediaRecorder.SetOutputFile(file);
                         mediaRecorder.SetVideoEncodingBitRate(bitRate);
                         mediaRecorder.SetVideoFrameRate(frameRate);
@@ -186,8 +206,6 @@ internal class MauiCameraView: GridLayout
                             maxVideoSize = new((int)Resolution.Width, (int)Resolution.Height);
                         mediaRecorder.SetVideoSize(maxVideoSize.Width, maxVideoSize.Height);
 
-                        mediaRecorder.SetVideoEncoder(VideoEncoder.H264);
-                        mediaRecorder.SetAudioEncoder(AudioEncoder.Aac);
                         IWindowManager windowManager = context.GetSystemService(Context.WindowService).JavaCast<IWindowManager>();
 
                         int rotation = (int)windowManager.DefaultDisplay.Rotation;
