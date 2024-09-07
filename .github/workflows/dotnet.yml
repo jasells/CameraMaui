@@ -41,7 +41,7 @@ jobs:
       run: dotnet build Camera.MAUI.Test/Camera.MAUI.Test.csproj -c Release -p:Version=$(git describe --tags)
 
   macBuild:
-    runs-on: macos-13
+    runs-on: macos-14
     steps:
     - uses: actions/checkout@v4
       with:
