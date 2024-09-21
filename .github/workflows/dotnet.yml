@@ -62,3 +62,24 @@ jobs:
       run: dotnet build Camera.MAUI/Camera.MAUI.csproj --no-restore -c Release -p:Version=$(git describe --tags)
     - name: Build Test
       run: dotnet build Camera.MAUI.Test/Camera.MAUI.Test.csproj --no-restore -c Release -p:Version=$(git describe --tags)
+
+  linuxBuild:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore workloads & dependencies
+      run: |
+        dotnet workload restore
+        dotnet restore
+    - name: Install Android tools
+      run: ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools"
+    - name: Build Lib
+      run: dotnet build Camera.MAUI/Camera.MAUI.csproj --no-restore -c Release -p:Version=$(git describe --tags)
+    - name: Build Test
+      run: dotnet build Camera.MAUI.Test/Camera.MAUI.Test.csproj --no-restore -c Release -p:Version=$(git describe --tags)
