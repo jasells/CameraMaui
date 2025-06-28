@@ -5,7 +5,9 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:local="clr-namespace:Camera.MAUI.Test"
              xmlns:cv="clr-namespace:Camera.MAUI;assembly=Camera.MAUI"
-             Title="MVVMPage" Background="white">
+             Title="MVVMPage"
+             Background="white"
+             x:DataType="local:CameraViewModel">
     <ContentPage.BindingContext>
         <local:CameraViewModel />
     </ContentPage.BindingContext>
@@ -27,11 +29,11 @@
                 </HorizontalStackLayout>
                 <HorizontalStackLayout HorizontalOptions="Center">
                     <Label Text="Mirrored" VerticalOptions="Center" TextColor="Black"/>
-                    <CheckBox BindingContext="{x:Reference cameraView}" VerticalOptions="Center" Color="Black" IsChecked="{Binding MirroredImage}"/>
+                    <CheckBox BindingContext="{x:Reference cameraView}" x:DataType="cv:CameraView" VerticalOptions="Center" Color="Black" IsChecked="{Binding MirroredImage}"/>
                     <Label Text="Torch" VerticalOptions="Center" TextColor="Black"/>
-                    <CheckBox BindingContext="{x:Reference cameraView}" VerticalOptions="Center" Color="Black" IsChecked="{Binding TorchEnabled}"/>
+                    <CheckBox BindingContext="{x:Reference cameraView}" x:DataType="cv:CameraView" VerticalOptions="Center" Color="Black" IsChecked="{Binding TorchEnabled}"/>
                     <Label Text="QR Detec." VerticalOptions="Center" TextColor="Black"/>
-                    <CheckBox BindingContext="{x:Reference cameraView}" VerticalOptions="Center" Color="Black" IsChecked="{Binding BarCodeDetectionEnabled}"/>
+                    <CheckBox BindingContext="{x:Reference cameraView}" x:DataType="cv:CameraView" VerticalOptions="Center" Color="Black" IsChecked="{Binding BarCodeDetectionEnabled}"/>
                 </HorizontalStackLayout>
                 <HorizontalStackLayout HorizontalOptions="Center">
                     <Label Text="AutoSnap freq: " VerticalOptions="Center" TextColor="Black"/>
@@ -39,11 +41,11 @@
                     <Label Text="Take Autosnap" VerticalOptions="Center" TextColor="Black"/>
                     <CheckBox VerticalOptions="Center" Color="Black" IsChecked="{Binding TakeSnapshot, Mode=OneWayToSource}"/>
                     <Label Text="As ISource" VerticalOptions="Center" TextColor="Black"/>
-                    <CheckBox BindingContext="{x:Reference cameraView}" IsChecked="{Binding AutoSnapShotAsImageSource}" VerticalOptions="Center" Color="Black"/>
+                    <CheckBox BindingContext="{x:Reference cameraView}" x:DataType="cv:CameraView" IsChecked="{Binding AutoSnapShotAsImageSource}" VerticalOptions="Center" Color="Black"/>
                 </HorizontalStackLayout>
                 <HorizontalStackLayout HorizontalOptions="Center" Margin="2" Spacing="2">
                     <Label Text="Zoom" VerticalOptions="Center" TextColor="Black"/>
-                    <Stepper BindingContext="{x:Reference cameraView}" Minimum="{Binding MinZoomFactor}" Maximum="7" Increment="0.5" Value="{Binding ZoomFactor,Mode=TwoWay}" />
+                    <Stepper BindingContext="{x:Reference cameraView}" x:DataType="cv:CameraView" Minimum="{Binding MinZoomFactor}" Maximum="7" Increment="0.5" Value="{Binding ZoomFactor,Mode=TwoWay}" />
                 </HorizontalStackLayout>
                 <HorizontalStackLayout HorizontalOptions="Center" Margin="5">
                     <Button Text="Start Camera" Command="{Binding StartCamera}" />
@@ -55,7 +57,7 @@
                     <Button Text="Stop Record" Command="{Binding StopRecording}" />
                 </HorizontalStackLayout>
                 <Label Text="{Binding BarcodeText}" TextColor="Black" FontAttributes="Bold" HorizontalOptions="Center" />
-                <Image BindingContext="{x:Reference cameraView}" Source="{Binding SnapShot}" Aspect="AspectFit" WidthRequest="250" HeightRequest="100" HorizontalOptions="Center" />
+                <Image BindingContext="{x:Reference cameraView}" x:DataType="cv:CameraView" Source="{Binding SnapShot}" Aspect="AspectFit" WidthRequest="250" HeightRequest="100" HorizontalOptions="Center" />
                 <toolkit:MediaElement Source="{Binding VideoSource}" ShouldAutoPlay="False" ShouldShowPlaybackControls="True" HeightRequest="300" WidthRequest="200" />
             </VerticalStackLayout>
         </Grid>

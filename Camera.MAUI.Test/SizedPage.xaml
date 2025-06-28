@@ -3,8 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="Camera.MAUI.Test.SizedPage"
+             xmlns:local="clr-namespace:Camera.MAUI.Test"
              xmlns:cv="clr-namespace:Camera.MAUI;assembly=Camera.MAUI"
-             Title="SizedPage" Background="white" x:Name="sizedPage">
+             Title="SizedPage"
+             Background="white"
+             x:Name="sizedPage"
+             x:DataType="cv:CameraView">
     <ScrollView>
         <Grid>
             <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
@@ -48,7 +52,7 @@
                     <Button Text="Start Record" Clicked="OnStartRecordingClicked" />
                     <Button Text="Stop Record" Clicked="OnStopRecordingClicked" />
                 </HorizontalStackLayout>
-                <Label BindingContext="{x:Reference sizedPage}" Text="{Binding BarcodeText}" TextColor="Black" FontAttributes="Bold" HorizontalOptions="Fill" HorizontalTextAlignment="Center" />
+                <Label BindingContext="{x:Reference sizedPage}" x:DataType="local:SizedPage" Text="{Binding BarcodeText}" TextColor="Black" FontAttributes="Bold" HorizontalOptions="Fill" HorizontalTextAlignment="Center" />
                 <Image x:Name="snapPreview" BindingContext="{x:Reference cameraView}" Aspect="AspectFit" Source="dotnet_bot.png" WidthRequest="300" HeightRequest="200" HorizontalOptions="Center"/>
                 <toolkit:MediaElement x:Name="player" ShouldAutoPlay="False" ShouldShowPlaybackControls="True" HeightRequest="300" WidthRequest="200" />
             </VerticalStackLayout>
