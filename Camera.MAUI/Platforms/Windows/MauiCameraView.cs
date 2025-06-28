@@ -511,12 +511,11 @@ public sealed partial class MauiCameraView : UserControl, IDisposable
         GC.Collect();
         return null;
     }
-    internal ImageSource GetSnapShot(ImageFormat imageFormat, bool auto = false)
+    private MemoryStream ReadSnapShotStream(ImageFormat imageFormat)
     {
-        ImageSource result = null;
-        if (started && !snapping && frameReader != null)
+        MemoryStream stream = new();
+        if (frameReader != null)
         {
-            snapping = true;
             SoftwareBitmap snapshot = null;
 
             var frame = frameReader.TryAcquireLatestFrame();
@@ -531,7 +530,6 @@ public sealed partial class MauiCameraView : UserControl, IDisposable
                     ImageFormat.JPEG => BitmapEncoder.JpegEncoderId,
                     _ => BitmapEncoder.PngEncoderId
                 };
-                MemoryStream stream = new();
                 BitmapEncoder encoder = BitmapEncoder.CreateAsync(iformat, stream.AsRandomAccessStream()).GetAwaiter().GetResult();
                 var img = SoftwareBitmap.Convert(snapshot, BitmapPixelFormat.Rgba8, BitmapAlphaMode.Premultiplied);
                 encoder.SetSoftwareBitmap(img);
@@ -541,22 +539,49 @@ public sealed partial class MauiCameraView : UserControl, IDisposable
                         encoder.BitmapTransform.Flip = BitmapFlip.Horizontal;
                     encoder.FlushAsync().GetAwaiter().GetResult();
                     stream.Position = 0;
-                    if (auto)
-                    {
-                        if (cameraView.AutoSnapShotAsImageSource)
-                            result = ImageSource.FromStream(() => stream);
-                        cameraView.SnapShotStream?.Dispose();
-                        cameraView.SnapShotStream = stream;
-                    }else
-                        result = ImageSource.FromStream(() => stream);
                     img.Dispose();
                     snapshot.Dispose();
                     frame.Dispose();
                 }
                 catch (Exception)
-                {
-                }
+                { }
             }
+        }
+        GC.Collect();
+        return stream;
+    }
+    internal Stream GetSnapShotStream(ImageFormat imageFormat)
+    {
+        MemoryStream stream = new();
+        if (started && !snapping)
+        {
+            snapping = true;
+            stream = ReadSnapShotStream(imageFormat);
+            snapping = false;
+        }
+        GC.Collect();
+        return stream;
+    }
+
+    internal ImageSource GetSnapShot(ImageFormat imageFormat, bool auto = false)
+    {
+        ImageSource result = null;
+        if (started && !snapping)
+        {
+            snapping = true;
+
+            var stream = ReadSnapShotStream(imageFormat);
+
+            if (auto)
+            {
+                if (cameraView.AutoSnapShotAsImageSource)
+                    result = ImageSource.FromStream(() => stream);
+                cameraView.SnapShotStream?.Dispose();
+                cameraView.SnapShotStream = stream;
+            }
+            else
+                result = ImageSource.FromStream(() => stream);
+
             snapping = false;
         }
         GC.Collect();
