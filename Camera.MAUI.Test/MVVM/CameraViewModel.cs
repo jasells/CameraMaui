@@ -41,6 +41,7 @@ public class CameraViewModel : INotifyPropertyChanged
     }
     public int NumCameras
     {
+        get => Cameras.Count; 
         set
         {
             if (value > 0)
@@ -69,6 +70,7 @@ public class CameraViewModel : INotifyPropertyChanged
     }
     public int NumMicrophones
     {
+        get => Microphones.Count;
         set
         {
             if (value > 0)
