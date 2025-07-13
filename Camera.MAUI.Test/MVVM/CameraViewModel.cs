@@ -134,10 +134,10 @@ public class CameraViewModel : INotifyPropertyChanged
     }
     public CameraViewModel()
     {
-        BarCodeOptions = new ZXingHelper.BarcodeDecodeOptions
+        BarCodeOptions = new BarcodeDecodeOptions
         {
             AutoRotate = true,
-            PossibleFormats = { ZXing.BarcodeFormat.QR_CODE },
+            PossibleFormats = { BarcodeFormat.EAN_13, BarcodeFormat.QR_CODE },
             ReadMultipleCodes = false,
             TryHarder = true,
             TryInverted = true

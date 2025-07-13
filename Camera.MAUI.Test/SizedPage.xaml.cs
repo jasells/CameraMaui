@@ -33,7 +33,7 @@ public partial class SizedPage : ContentPage
         cameraView.BarCodeOptions = new ZXingHelper.BarcodeDecodeOptions
         {
             AutoRotate = true,
-            PossibleFormats = { BarcodeFormat.EAN_13 },
+            PossibleFormats = { BarcodeFormat.EAN_13, BarcodeFormat.QR_CODE },
             ReadMultipleCodes = false,
             TryHarder = false,
             TryInverted = true
