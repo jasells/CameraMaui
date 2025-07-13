@@ -32,7 +32,7 @@
                     <CheckBox BindingContext="{x:Reference cameraView}" x:DataType="cv:CameraView" VerticalOptions="Center" Color="Black" IsChecked="{Binding MirroredImage}"/>
                     <Label Text="Torch" VerticalOptions="Center" TextColor="Black"/>
                     <CheckBox BindingContext="{x:Reference cameraView}" x:DataType="cv:CameraView" VerticalOptions="Center" Color="Black" IsChecked="{Binding TorchEnabled}"/>
-                    <Label Text="QR Detec." VerticalOptions="Center" TextColor="Black"/>
+                    <Label Text="Barcode Detection" VerticalOptions="Center" TextColor="Black"/>
                     <CheckBox BindingContext="{x:Reference cameraView}" x:DataType="cv:CameraView" VerticalOptions="Center" Color="Black" IsChecked="{Binding BarCodeDetectionEnabled}"/>
                 </HorizontalStackLayout>
                 <HorizontalStackLayout HorizontalOptions="Center">

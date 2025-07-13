@@ -26,7 +26,7 @@
                     <CheckBox CheckedChanged="CheckBox_CheckedChanged" VerticalOptions="Center" Color="Black"/>
                     <Label x:Name="torchLabel" Text="Torch" VerticalOptions="Center" TextColor="Black"/>
                     <CheckBox x:Name="torchCheck" CheckedChanged="CheckBox4_CheckedChanged" VerticalOptions="Center" Color="Black"/>
-                    <Label Text="QR Detec." VerticalOptions="Center" TextColor="Black"/>
+                    <Label Text="Barcode Detection" VerticalOptions="Center" TextColor="Black"/>
                     <CheckBox CheckedChanged="CheckBox3_CheckedChanged" VerticalOptions="Center" Color="Black"/>
                 </HorizontalStackLayout>
                 <HorizontalStackLayout HorizontalOptions="Center">
