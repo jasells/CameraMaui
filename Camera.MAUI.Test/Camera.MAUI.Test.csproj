@@ -47,6 +47,9 @@
 		<Platforms>x86</Platforms>
 		<RuntimeIdentifier>win10-x86</RuntimeIdentifier>
 	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+	  <CodesignKey>Apple Development: Joshua Sells (SU5MZJQ3W2)</CodesignKey>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<!-- App Icon -->
@@ -69,8 +72,8 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
-		<PackageReference Include="CommunityToolkit.Maui" Version="11.2.0" />
-		<PackageReference Include="CommunityToolkit.Maui.MediaElement" Version="5.0.0" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="9.1.1" />
+		<PackageReference Include="CommunityToolkit.Maui.MediaElement" Version="4.1.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.3" />
 	</ItemGroup>
 
