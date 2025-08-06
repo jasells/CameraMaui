@@ -34,6 +34,6 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app needs access to the microphone for record videos</string>
 	<key>CFBundleIdentifier</key>
-	<string></string>
+	<string>com.bloomerang.mauicam.test</string>
 </dict>
 </plist>
