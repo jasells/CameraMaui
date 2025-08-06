@@ -32,7 +32,8 @@
             SemanticProperties.Hint="Checks camera and microphone permissions"
             Command="{Binding CheckPermissionsCommand}"
             IsEnabled="{Binding PermissionsGranted, Converter={toolkit:InvertedBoolConverter}}"
-            HorizontalOptions="Center" />
+            HorizontalOptions="Center" 
+            TextColor="Navy"/>
 
     </VerticalStackLayout>
 

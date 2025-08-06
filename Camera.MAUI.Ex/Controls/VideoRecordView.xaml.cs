@@ -72,14 +72,6 @@ public partial class VideoRecordView : NavAwareView
 
         // Replace the lambda with the instance method
         CameraView.PropertyChanged += CameraView_PropertyChanged;
-
-        // On Android, setting to true is not mirroring using front camera - GitHub issue: https://github.com/hjam40/Camera.MAUI/issues/137
-        // On iPad, setting to true will render the camera display upside down on landscape using front camera
-        // On iPhone, setting to false will render the camera display upside down on landscape using front camera
-        // using Back camera have different behavior also, but we are not using back camera for now, just noting here for future reference
-        CameraView.MirroredImage = DeviceInfo.Platform == DevicePlatform.iOS
-                                    && DeviceInfo.Idiom == DeviceIdiom.Phone;
-
         _videoPlayerService = videoPlayerSrv;
 
         return this;
@@ -162,6 +154,19 @@ public partial class VideoRecordView : NavAwareView
         // tell the service about which view is currently visible
         CameraService.CameraView = CameraView;
         CameraService.StartAccelerometer();
+
+
+        // On Android, setting to true is not mirroring using front camera - GitHub issue: https://github.com/hjam40/Camera.MAUI/issues/137
+        // On iPad, setting to true will render the camera display upside down on landscape using front camera
+        // On iPhone, setting to false will render the camera display upside down on landscape using front camera
+        // using Back camera have different behavior also, but we are not using back camera for now, just noting here for future reference
+        CameraView.MirroredImage = DeviceInfo.Platform == DevicePlatform.iOS
+                                    && DeviceInfo.Idiom == DeviceIdiom.Phone;
+
+        if (CameraService.ActiveCamera?.Position == CameraPosition.Back)
+        {
+            CameraView.MirroredImage = false; // back camera should not be mirrored, ever!
+        }
 
         // at least set the initial preview state, even if we can't get any updates to change it on the fly...
         // shouldn't need to now that the service has a view-ref, can just call it directly there...
