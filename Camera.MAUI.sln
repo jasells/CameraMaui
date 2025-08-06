@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Camera.MAUI", "Camera.MAUI\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Camera.MAUI.Test", "Camera.MAUI.Test\Camera.MAUI.Test.csproj", "{AFE92281-679D-4DC3-AD37-C2BAA6D1C2BD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Camera.MAUI.Ex", "Camera.MAUI.Ex\Camera.MAUI.Ex.csproj", "{07536477-9ED4-C5EF-9CD5-B6278B5F15F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Video_Demo", "Video_demo\Video_Demo.csproj", "{8280773D-08E3-742B-40AA-74F61EAA6105}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +27,16 @@ Global
 		{AFE92281-679D-4DC3-AD37-C2BAA6D1C2BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFE92281-679D-4DC3-AD37-C2BAA6D1C2BD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AFE92281-679D-4DC3-AD37-C2BAA6D1C2BD}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{07536477-9ED4-C5EF-9CD5-B6278B5F15F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07536477-9ED4-C5EF-9CD5-B6278B5F15F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07536477-9ED4-C5EF-9CD5-B6278B5F15F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07536477-9ED4-C5EF-9CD5-B6278B5F15F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8280773D-08E3-742B-40AA-74F61EAA6105}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8280773D-08E3-742B-40AA-74F61EAA6105}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8280773D-08E3-742B-40AA-74F61EAA6105}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{8280773D-08E3-742B-40AA-74F61EAA6105}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8280773D-08E3-742B-40AA-74F61EAA6105}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8280773D-08E3-742B-40AA-74F61EAA6105}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Video_Demo.ViewModel"
+             xmlns:resources="clr-namespace:Camera.MAUI.Ex.Resources;assembly=Camera.MAUI.Ex"
+             xmlns:controls="clr-namespace:Camera.MAUI.Ex.Controls;assembly=Camera.MAUI.Ex"
+             x:Class="Video_Demo.Views.SettingsPage"
+             x:DataType="vm:SettingsViewModel"
+             Title="{x:Static resources:Strings.Settings}">
+    <VerticalStackLayout BackgroundColor="{x:Static resources:Colors.Snow}" Margin="15">
+
+        <!-- Camera Settings Section -->
+        <Label Text="{x:Static resources:Strings.Cameras}" FontSize="24" TextColor="{x:Static resources:Colors.Leaf}" />
+        <Picker TextColor="{x:Static resources:Colors.Blackbird}"
+                ItemsSource="{Binding CameraService.Cameras}"
+                SelectedItem="{Binding CameraService.ActiveCamera, Mode=TwoWay}"/>
+
+        <Label Text="{x:Static resources:Strings.CameraResolutions}"
+               FontSize="24" TextColor="{x:Static resources:Colors.Leaf}" />
+        <Picker TextColor="{x:Static resources:Colors.Blackbird}"
+                ItemsSource="{Binding CameraService.ActiveCamera.AvailableResolutions}"
+                SelectedItem="{Binding CameraService.SelectedResolution, Mode=TwoWay}"/>
+       
+        <!-- Send Email Section -->
+        <Button Margin="20" Text="Send Email" Command="{Binding SendTestEmailCommand}" />
+
+    </VerticalStackLayout>
+</ContentPage>

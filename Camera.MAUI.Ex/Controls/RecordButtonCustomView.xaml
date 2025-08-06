@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="Camera.MAUI.Ex.Controls.RecordButtonCustomView"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    x:Name="This">
+
+    <!-- Record Button -->
+    <Grid
+        WidthRequest="{Binding VideoRecService.RecordButtonSize, Source={x:Reference This}}" 
+        HeightRequest="{Binding VideoRecService.RecordButtonSize, Source={x:Reference This}}">
+        
+        <!-- Outer White Circle -->
+        <Ellipse
+            Stroke="{Binding VideoRecService.RecordButtonOutlineColor, Source={x:Reference This}}"
+            StrokeThickness="{Binding VideoRecService.RecordButtonOutlineWidth, Source={x:Reference This}}"
+            WidthRequest="{Binding VideoRecService.RecordButtonSize, Source={x:Reference This}}"
+            HeightRequest="{Binding VideoRecService.RecordButtonSize, Source={x:Reference This}}"/>
+        
+        <!-- Inner Red Circle -->
+        <Ellipse
+            IsVisible="{Binding VideoRecService.RecordVideo, Converter={toolkit:InvertedBoolConverter}, Source={x:Reference This}}"
+            Fill="{Binding VideoRecService.PlayIconColor, Source={x:Reference This}}"
+            WidthRequest="{Binding VideoRecService.PlayIconSize, Source={x:Reference This}}"
+            HeightRequest="{Binding VideoRecService.PlayIconSize, Source={x:Reference This}}"
+            HorizontalOptions="Center"
+            VerticalOptions="Center"/>
+        
+        <!-- Inner Red Square -->
+        <Rectangle
+            IsVisible="{Binding VideoRecService.RecordVideo, Source={x:Reference This}}"
+            Fill="{Binding VideoRecService.StopIconColor, Source={x:Reference This}}"
+            WidthRequest="{Binding VideoRecService.StopIconSize, Source={x:Reference This}}"
+            HeightRequest="{Binding VideoRecService.StopIconSize, Source={x:Reference This}}"
+            RadiusX="5"
+            RadiusY="5"
+            HorizontalOptions="Center"
+            VerticalOptions="Center"/>
+    </Grid>
+</ContentView>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<controls:NavAwareView
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:controls="clr-namespace:Camera.MAUI.Ex.Controls;assembly=Camera.MAUI.Ex"
+    x:Class="Camera.MAUI.Ex.Controls.VideoPreview"
+    x:Name="This">
+
+    <!-- Do not add a ScrollView or any parent layout
+        that will interfere with the pan gesture in VideoPreviewSlider -->
+    
+    <controls:VideoPlayerView
+        x:Name="PlayerView">
+        
+        <StackLayout
+            BackgroundColor="Transparent"
+            IsVisible="True">
+
+            <controls:VideoPreviewSlider x:Name="Slider">
+
+                <controls:VideoPreviewSlider.Behaviors>
+                    <toolkit:EventToCommandBehavior 
+                        EventName="SeekPlayer"                                               
+                        Command="{Binding Source={x:Reference This}, Path=VideoService.SeekPlayer}"
+                        CommandParameter="{Binding SeekCommandParameter, Source={x:Reference Slider}}"/>
+                </controls:VideoPreviewSlider.Behaviors>
+            </controls:VideoPreviewSlider>
+        </StackLayout>
+    </controls:VideoPlayerView>
+</controls:NavAwareView>

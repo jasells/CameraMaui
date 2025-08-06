@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<controls:NavAwareView
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:Camera.MAUI.Ex.Controls;assembly=Camera.MAUI.Ex"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    x:Class="Camera.MAUI.Ex.Controls.VideoRecordView"
+    x:Name="This">
+    
+    <Grid
+        BackgroundColor="{Binding VideoRecService.RecordViewBackgroundColor, Source={x:Reference This}}"
+        ColumnSpacing="0"
+        RowSpacing="0">
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Camera Preview -->
+        <controls:CameraViewEx
+            Grid.Row="0"
+            Grid.RowSpan="3"
+            x:Name="CameraView"
+            Margin="0"
+            AutoRecordingFile="{Binding VideoRecService.FilePath, Source={x:Reference This}}"
+            Camera="{Binding CameraService.ActiveCamera, Source={x:Reference This}}"                                   
+            Microphone="{Binding CameraService.ActiveMic, Source={x:Reference This}}"
+        />
+        
+        <!--Recording Timer and progress bar -->
+        <controls:CountdownTimerView
+            x:Name="CountdownTimerView"
+            Grid.Row="0"
+            HorizontalOptions="Fill"
+            VerticalOptions="Start"/>
+
+        <!--Recording Hint Text -->
+        <Label
+            Grid.Row="1"
+            Text="{Binding VideoRecService.OngoingRecordingMessage, Source={x:Reference This}}"
+            TextColor="{Binding VideoRecService.RecordingMessageTextColor, Source={x:Reference This}}"
+            FontSize="{Binding VideoRecService.RecordingMessageFontSize, Source={x:Reference This}}"
+            FontFamily="{Binding VideoRecService.RecordingMessageFontFamily, Source={x:Reference This}}"
+            Padding="{Binding VideoRecService.RecordingMessagePadding, Source={x:Reference This}}"
+            HorizontalTextAlignment="Center"
+            IsVisible="{Binding VideoRecService.RecordVideo, Source={x:Reference This}}"
+            BackgroundColor="{Binding VideoRecService.RecordingMessageBackgroundColor, Source={x:Reference This}}"
+            HorizontalOptions="Fill"
+            VerticalOptions="Start"/>
+        
+        <!-- Record Button and Tooltips -->
+        <VerticalStackLayout
+            Grid.Row="2"
+            Spacing="{Binding VideoRecService.StartRecordingBottomSpacing, Source={x:Reference This}}"
+            Margin="{Binding VideoRecService.RecordButtonMargin, Source={x:Reference This}}"
+            HorizontalOptions="Center"
+            VerticalOptions="End">
+            
+            <!--Record Hint Text -->
+            <Label 
+                Text="{Binding VideoRecService.StartRecordingMessage, Source={x:Reference This}}"
+                TextColor="{Binding VideoRecService.RecordingMessageTextColor, Source={x:Reference This}}"
+                FontSize="{Binding VideoRecService.RecordingMessageFontSize, Source={x:Reference This}}"
+                FontFamily="{Binding VideoRecService.RecordingMessageFontFamily, Source={x:Reference This}}"
+                Padding="{Binding VideoRecService.RecordingMessagePadding, Source={x:Reference This}}"
+                HorizontalTextAlignment="Center" 
+                IsVisible="{Binding VideoRecService.RecordVideo, Converter={toolkit:InvertedBoolConverter}, Source={x:Reference This}}"
+                BackgroundColor="{Binding VideoRecService.RecordingMessageBackgroundColor, Source={x:Reference This}}"
+                HorizontalOptions="Center"/>
+            
+            <controls:RecordButtonCustomView
+                x:Name="RecordButtonCustomView"
+                IsEnabled="{Binding VideoRecService.RecordButtonEnabled, Source={x:Reference This}}"
+                HorizontalOptions="Center">
+                <controls:RecordButtonCustomView.GestureRecognizers>
+                    <TapGestureRecognizer 
+                        Command="{Binding VideoRecService.ToggleVideoCommand, Source={x:Reference This}}"
+                        CommandParameter="{Binding VideoRecService.RecordButtonEnabled, Source={x:Reference This}}"/>
+                </controls:RecordButtonCustomView.GestureRecognizers>
+            </controls:RecordButtonCustomView>
+        </VerticalStackLayout>
+    </Grid>
+</controls:NavAwareView>

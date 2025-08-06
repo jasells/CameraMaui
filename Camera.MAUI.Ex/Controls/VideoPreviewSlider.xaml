@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<Grid
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:Camera.MAUI.Ex.Controls"
+    x:Class="Camera.MAUI.Ex.Controls.VideoPreviewSlider"      
+    x:Name="This">
+    
+    <controls:ImageSliderBase
+        x:Name="InternalSlider"
+        Margin="{Binding VideoService.SliderBaseMargin, Source={x:Reference This}}"/>
+    
+    <Grid
+        x:Name="SlideGrid"
+        Margin="{Binding VideoService.SliderBaseMargin, Source={x:Reference This}}">
+        
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
+        </Grid.GestureRecognizers>
+    </Grid>
+
+    <!-- Because it is hard for a user to tap on the exact position bar,
+         it is being contained in a transparent ContentView.
+         The ContentView is what is actually getting moved. -->
+    
+    <!-- On Android, micro-adjustments by tap are not possible because
+         of the size of this ContentView.
+         This is the bug for it: https://github.com/dotnet/maui/issues/8121 -->
+    
+    <ContentView
+        x:Name="PositionBarBubble"
+        WidthRequest="{Binding VideoService.PositionBarHeight, Source={x:Reference This}}"
+        HorizontalOptions="Start"
+        Margin="0"
+        Padding="0"
+        TranslationX="{Binding VideoService.SliderPositionBarStartingPoint, Source={x:Reference This}}">
+        
+        <BoxView
+            WidthRequest="{Binding VideoService.SliderPositionBarWidth, Source={x:Reference This}}"
+            Color="{Binding VideoService.SliderPositionBarColor, Source={x:Reference This}}"
+            HorizontalOptions="Center"
+            InputTransparent="True" />
+        
+        <ContentView.GestureRecognizers>
+            <controls:CorrectedPanGestureRecognizer PanUpdated="PositionBar_PanUpdated" />
+        </ContentView.GestureRecognizers>
+    </ContentView>
+</Grid>

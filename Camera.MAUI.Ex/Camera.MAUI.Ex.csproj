@@ -1,0 +1,87 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net8.0;net8.0-android;net8.0-ios;</TargetFrameworks>
+        <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.20348.0</TargetFrameworks>
+        <UseMaui>true</UseMaui>
+        <SingleProject>true</SingleProject>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <PackageId>$(MSBuildProjectName.Replace(" ", "_"))</PackageId>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Version>0.0.999.1</Version>
+        <!--<PackageIcon>icon.png</PackageIcon>-->
+        <ProjectUrl></ProjectUrl>
+        <RepositoryUrl></RepositoryUrl>
+        <Description>.NET MAUI plugin for Video.</Description>
+        <ReleaseNotes>.NET MAUI plugin for Video.</ReleaseNotes>
+        <Copyright>Copyright 2024</Copyright>
+        <Tags>Maui Video</Tags>
+        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>
+        <!--<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">13.1</SupportedOSPlatformVersion>-->
+        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">28.0</SupportedOSPlatformVersion>
+        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</SupportedOSPlatformVersion>
+        <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</TargetPlatformMinVersion>
+        <!--<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>-->
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+      <!--ensure debug symbols in .nupkg for sourcelink (debug from consumer app stack)-->
+      <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+      <Company>XDev</Company>
+      <PackageReadmeFile>README.md</PackageReadmeFile>
+      
+    </PropertyGroup>
+  <!--ensure readme in package-->
+  <ItemGroup>
+    <None Include="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <!--use a custom icon for pack... not required, but pretty slick
+       requires the PackageIcon tag above to point to the icon once packed so package-viewers can use it-->
+  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="CameraMaui" Version="1.4.11" />
+        <PackageReference Include="CommunityToolkit.Maui" Version="8.0.1" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+        <PackageReference Include="LibVLCSharp" Version="3.9.3" />
+        <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.100" />
+        <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.100" />
+        <PackageReference Include="SkiaSharp" Version="3.116.1" />
+        <PackageReference Include="System.Reactive" Version="6.0.1" />
+    </ItemGroup>
+
+    <ItemGroup Condition="$(TargetFramework.Contains('ios'))">
+        <PackageReference Include="VideoLAN.LibVLC.iOS" Version="3.3.18" />
+    </ItemGroup>
+
+    <ItemGroup Condition="$(TargetFramework.Contains('android'))">
+        <PackageReference Include="VideoLAN.LibVLC.Android" Version="3.5.3" />
+    </ItemGroup>
+
+  <ItemGroup Condition="$(TargetFramework.Contains('windows'))">
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.18" />
+  </ItemGroup>
+    
+  <ItemGroup>
+    <MauiFont Include="Resources\Fonts\*" />
+  </ItemGroup>
+    
+  <ItemGroup>
+    <MauiXaml Update="Controls\UploadProgress.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+  </ItemGroup>
+    
+  <!-- Make sure any old temp files are removed-->
+  <Target Name="CustomClean" AfterTargets="Clean" Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <Message Text="Running custom clean up... $(ProjectDir)bin" />
+    <Exec Command="rmdir /s /q $(ProjectDir)bin" />
+    <Message Text="Running custom clean up... $(ProjectDir)obj" />
+    <Exec Command="rmdir /s /q $(ProjectDir)obj" />
+  </Target>
+  <Target Name="CustomCleanMac" AfterTargets="Clean" Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+    <Message Text="Running custom clean up... $(ProjectDir)bin" />
+    <Exec Command="rm -R $(ProjectDir)bin" ContinueOnError="true" />
+    <Message Text="Running custom clean up... $(ProjectDir)obj" />
+    <Exec Command="rm -R $(ProjectDir)obj" ContinueOnError="true" />
+  </Target>
+</Project>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="Camera.MAUI.Ex.Controls.VideoPlayerView"
+    xmlns:controls="clr-namespace:Camera.MAUI.Ex.Controls;assembly=Camera.MAUI.Ex"
+    x:Name="This">
+    
+    <ContentView.ControlTemplate>
+        
+        <ControlTemplate
+            x:DataType="controls:VideoPlayerView">
+            
+            <Grid
+                BackgroundColor="{Binding VideoService.ViewBackgroundColor, Source={RelativeSource TemplatedParent}}"
+                RowDefinitions="Auto, Auto"
+                ColumnDefinitions="*"
+                ColumnSpacing="0"
+                RowSpacing="0">
+                
+                <Border 
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    StrokeThickness="0"
+                    BackgroundColor="{Binding VideoService.PlayerBackgroundColor, Source={RelativeSource TemplatedParent}}"
+                    HeightRequest="{Binding VideoService.VideoViewHeight, Source={RelativeSource TemplatedParent}}"
+                    Margin="{Binding VideoService.PlayerBorderMargin, Source={RelativeSource TemplatedParent}}">
+                    
+                    <Grid
+                        ColumnSpacing="0"
+                        RowSpacing="0">
+                        
+                        <!-- allow taps anywhere on the video-display area to play/pause -->
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding VideoService.PlayCommand, Source={x:Reference This}}"/>
+                        </Grid.GestureRecognizers>
+                        
+                        <!-- Video Player -->
+                        <controls:VideoView
+                            x:Name="VideoView" 
+                            HeightRequest="{Binding VideoService.VideoViewHeight, Source={RelativeSource TemplatedParent}}"
+                            WidthRequest="{Binding VideoService.VideoViewWidth, Source={RelativeSource TemplatedParent}}"
+                            MediaPlayer="{Binding MediaPlayer, Source={RelativeSource TemplatedParent}}"
+                            InputTransparent="False">
+                        </controls:VideoView>
+                    
+                        <!-- Overlay -->
+                        <Grid 
+                            IsVisible="{Binding IsVideoPreview, Source={RelativeSource TemplatedParent}}">
+                            
+                            <!-- Centered Play/Pause Button -->
+                            <controls:PlayPauseButton
+                                InputTransparent="True"
+                                IsVisible="{Binding IsPlayControlVisible, Source={RelativeSource TemplatedParent}}"
+                                IsPlaying="{Binding MediaPlayer.IsPlaying, Source={RelativeSource TemplatedParent}}"
+                                IconSize="{Binding VideoService.PlayPauseIconSize, Source={RelativeSource TemplatedParent}}"/>
+                        
+                            <!-- Timestamp at Bottom -->
+                            <Border
+                                Stroke="Transparent"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 4"
+                                Background="{Binding VideoService.TimestampBackgroundColor, Source={RelativeSource TemplatedParent}}"
+                                HorizontalOptions="Start"
+                                VerticalOptions="End"
+                                Margin="{Binding VideoService.TimestampMargin, Source={RelativeSource TemplatedParent}}"
+                                Padding="{Binding VideoService.TimestampPadding, Source={RelativeSource TemplatedParent}}"
+                                InputTransparent="True">
+                                
+                                <Label 
+                                    Text="{Binding ProgressVideoTime, Source={RelativeSource TemplatedParent}}"
+                                    TextColor="{Binding VideoService.TimestampTextColor, Source={x:Reference This}}"
+                                    FontSize="{Binding VideoService.TimestampFontSize, Source={x:Reference This}}"
+                                    FontFamily="{Binding VideoService.TimestampFontFamily, Source={x:Reference This}}"
+                                    IsVisible="{Binding IsVideoPreview, Source={RelativeSource TemplatedParent}}"
+                                    InputTransparent="True"/>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Border>
+                
+                <!-- Sliders -->
+                <ContentPresenter
+                    Grid.Row="1"
+                    Grid.Column="0"/>
+            </Grid>
+        </ControlTemplate>
+    </ContentView.ControlTemplate>
+</ContentView>

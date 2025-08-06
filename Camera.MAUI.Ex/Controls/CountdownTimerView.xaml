@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentView
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="Camera.MAUI.Ex.Controls.CountdownTimerView"
+    x:Name="This"
+    BackgroundColor="{Binding VideoRecService.HeaderBackgroundColor, Source={x:Reference This}}">
+
+    <Grid 
+        ColumnDefinitions="*,*" 
+        ColumnSpacing="{Binding VideoRecService.CountdownTimerViewSpacing, Source={x:Reference This}}"
+        Padding="{Binding VideoRecService.CountdownTimerViewPadding, Source={x:Reference This}}"
+        VerticalOptions="Center">
+
+        <!-- Timer Text -->
+        <Label 
+            Grid.Column="0"
+            Text="{Binding VideoRecService.SecondsRemainingFormatted, Source={x:Reference This}}"
+            TextColor="{Binding VideoRecService.TimerTextColor, Source={x:Reference This}}"
+            BackgroundColor="{Binding VideoRecService.TimerBackgroundColor, Source={x:Reference This}}"
+            FontSize="{Binding VideoRecService.TimerFontSize, Source={x:Reference This}}"
+            FontFamily="{Binding VideoRecService.TimerFontFamily, Source={x:Reference This}}"
+            VerticalOptions="Center"
+            HorizontalOptions="Center"
+            Padding="{Binding VideoRecService.TimerLabelPadding, Source={x:Reference This}}"/>
+
+        <!-- Progress Bar -->
+        <ProgressBar
+            Grid.Column="1"
+            Progress="{Binding VideoRecService.Progress, Source={x:Reference This}}"
+            ProgressColor="{Binding VideoRecService.ProgressColor, Source={x:Reference This}}"
+            BackgroundColor="Transparent"
+            HeightRequest="{Binding VideoRecService.ProgressHeight, Source={x:Reference This}}"
+            ScaleY="2"
+            VerticalOptions="Center"
+            HorizontalOptions="FillAndExpand"/>
+    </Grid>
+</ContentView>

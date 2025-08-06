@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Camera.MAUI.Ex.Controls.UploadProgress"
+             x:Name="This"
+             BackgroundColor="Transparent">
+
+    <Grid
+        ColumnSpacing="{Binding Source={x:Reference This},
+                                Path=UploadService.ColumnSpacing}"
+        VerticalOptions="Center">
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="{Binding Source={x:Reference This},
+                                              Path=UploadService.ProgressColumnWidth}"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Progress Bar -->
+        <ProgressBar Grid.Column="0"
+                     Progress="{Binding Source={x:Reference This},
+                                        Path=UploadService.Progress}"
+                     ProgressColor="{Binding Source={x:Reference This},
+                                             Path=UploadService.ProgressColor}"
+                     BackgroundColor="{Binding Source={x:Reference This},
+                                             Path=UploadService.ProgressBackGroundColor}"
+                     HeightRequest="{Binding Source={x:Reference This},
+                                             Path=UploadService.ProgressHeightRequest}"
+                     ScaleY="2"
+                     VerticalOptions="Fill"/>
+        
+        <!--the percentage lbl-->
+        <Label Grid.Column="1"
+                VerticalOptions="Center"
+                HorizontalOptions="Start"
+                Text="{Binding Source={x:Reference This},
+                                Path=UploadService.ProgressPercent}"
+                TextColor="{Binding Source={x:Reference This},
+                                    Path=UploadService.ProgressPercentTextColor}"
+                FontSize="{Binding Source={x:Reference This},
+                                    Path=UploadService.ProgressPercentFontSize}"
+                FontFamily="{Binding Source={x:Reference This},
+                                    Path=UploadService.ProgressPercentFont}"               
+                BackgroundColor="{Binding Source={x:Reference This},
+                                            Path=UploadService.ProgressPercentTextBackColor}"/>
+        
+        <!-- Status Text -->
+        <Label Grid.Column="2"
+                Text="{Binding Source={x:Reference This},
+                               Path=UploadService.UploadStatusMessage}"
+                TextColor="{Binding Source={x:Reference This},
+                                    Path=UploadService.UploadStatusTextColor}"
+                FontSize="{Binding Source={x:Reference This},
+                                    Path=UploadService.UploadStatusFontSize}"
+                FontFamily="{Binding Source={x:Reference This},
+                                     Path=UploadService.UploadStatusFont}"
+                BackgroundColor="{Binding Source={x:Reference This},
+                                          Path=UploadService.UploadStatusTextBackColor}"
+                VerticalOptions="Center"
+                HorizontalOptions="End"
+                Padding="{Binding Source={x:Reference This},
+                                  Path=UploadService.StatusLabelPadding}"/>
+    </Grid>
+</ContentView>

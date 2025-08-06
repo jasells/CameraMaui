@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Grid xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Camera.MAUI.Ex.Controls.TrimThumb"
+             x:Name="This">
+    <BoxView 
+        x:Name="Bookend" 
+        BackgroundColor="{Binding ThumbColor, Source={x:Reference This}}" 
+        CornerRadius="{Binding ThumbCornerRadius, Source={x:Reference This}}" />
+    <BoxView 
+        BackgroundColor="{Binding ThumbInnerLineColor, Source={x:Reference This}}" 
+        HeightRequest="{Binding ThumbInnerLineHeight, Source={x:Reference This}}" 
+        WidthRequest="{Binding ThumbInnerLineWidth, Source={x:Reference This}}" 
+        CornerRadius="{Binding ThumbInnerLineCornerRadius, Source={x:Reference This}}" />
+</Grid>

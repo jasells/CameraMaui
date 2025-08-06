@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Grid xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:Camera.MAUI.Ex.Controls"
+             xmlns:resources="clr-namespace:Camera.MAUI.Ex.Resources"
+             x:Class="Camera.MAUI.Ex.Controls.ImageHighlightSlider"
+             Margin="{Binding HighlightSliderMargin, Source={x:Reference This}}"
+             x:Name="This">
+    <controls:ImageSliderBase 
+        x:Name="SliderBase" 
+        Margin="{Binding SliderBaseMargin, Source={x:Reference This}}"/>
+    
+    <Grid x:Name="SlideGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition 
+                Width="{Binding LeftBoxWidthRequest, 
+                Source={x:Reference This}}" />
+            <ColumnDefinition 
+                Width="*" />
+            <ColumnDefinition 
+                Width="{Binding RightBoxWidthRequest, 
+                Source={x:Reference This}}" />
+        </Grid.ColumnDefinitions>
+        <BoxView Grid.Column="0" 
+                 BackgroundColor="{x:Static resources:Colors.Snow}" 
+                 Opacity="0.6">
+            <BoxView.GestureRecognizers>
+                <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
+            </BoxView.GestureRecognizers>
+        </BoxView>
+        <ContentView Grid.Column="1" 
+                     x:Name="Thumb" 
+                     BackgroundColor="{x:Static resources:Colors.Transparent}" 
+                     WidthRequest="{Binding ImageSelectorWidthRequest, Source={x:Reference This}}" 
+                     HeightRequest="{Binding ImageSelectorHeightRequest, Source={x:Reference This}}">
+            <Border 
+                StrokeThickness="3" 
+                Stroke="{x:Static resources:Colors.Leaf}" 
+                BackgroundColor="{x:Static resources:Colors.Transparent}">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="{Binding ImageSelectorCornerRadius, Source={x:Reference This}}" />
+                </Border.StrokeShape>
+            </Border>
+            <ContentView.GestureRecognizers>
+                <controls:CorrectedPanGestureRecognizer PanUpdated="PanGestureRecognizer_PanUpdated" />
+                <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
+            </ContentView.GestureRecognizers>
+        </ContentView>
+        <BoxView 
+            Grid.Column="2" 
+            BackgroundColor="{x:Static resources:Colors.Snow}" 
+            Opacity="0.6">
+            <BoxView.GestureRecognizers>
+                <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
+            </BoxView.GestureRecognizers>
+        </BoxView>
+    </Grid>
+</Grid>

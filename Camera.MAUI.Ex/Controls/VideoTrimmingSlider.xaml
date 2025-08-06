@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Grid xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:Camera.MAUI.Ex.Controls"
+             xmlns:resources="clr-namespace:Camera.MAUI.Ex.Resources"
+             x:Class="Camera.MAUI.Ex.Controls.VideoTrimmingSlider"      
+             x:Name="This">
+    <controls:ImageSliderBase 
+        Margin="{Binding SliderBaseMargin, Source={x:Reference This}}"/>
+    
+    <Grid x:Name="SlideGrid">
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="{Binding LeftBoxWidthRequest, Source={x:Reference This}}" />
+            <ColumnDefinition Width="{Binding ThumbWidth, Source={x:Reference This}}" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="{Binding ThumbWidth, Source={x:Reference This}}" />
+            <ColumnDefinition Width="{Binding RightBoxWidthRequest, Source={x:Reference This}}" />
+        </Grid.ColumnDefinitions>
+        
+        <BoxView 
+            Grid.Column="0" 
+            BackgroundColor="{x:Static resources:Colors.Snow}" 
+            Opacity="0.6" />
+        
+        <controls:TrimThumb 
+            Grid.Column="1" 
+            x:Name="LeftThumb" 
+            Margin="{Binding ThumbMargin, Source={x:Reference This}}"
+            IsLeft="true">
+            
+            <controls:TrimThumb.GestureRecognizers>
+                <controls:CorrectedPanGestureRecognizer PanUpdated="Bookend_PanUpdated" />
+                <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
+            </controls:TrimThumb.GestureRecognizers>
+        </controls:TrimThumb>
+        
+        <ContentView 
+            Grid.Column="2" 
+            BackgroundColor="{x:Static resources:Colors.Transparent}" 
+            Margin="{Binding ThumbMargin, Source={x:Reference This}}">
+            
+            <Grid>
+                <BoxView 
+                    HeightRequest="{Binding SliderHeight, Source={x:Reference This}}" 
+                    BackgroundColor="{Binding SliderColor, Source={x:Reference This}}" 
+                    VerticalOptions="Start" />
+                <BoxView 
+                    HeightRequest="{Binding SliderHeight, Source={x:Reference This}}" 
+                    BackgroundColor="{Binding SliderColor, Source={x:Reference This}}" 
+                    VerticalOptions="End" />
+            </Grid>
+            
+            <ContentView.GestureRecognizers>
+                <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
+            </ContentView.GestureRecognizers>
+        </ContentView>
+        
+        <controls:TrimThumb 
+            Grid.Column="3" 
+            x:Name="RightThumb" 
+            Margin="{Binding ThumbMargin, Source={x:Reference This}}" 
+            IsLeft="false">
+            
+            <controls:TrimThumb.GestureRecognizers>
+                <controls:CorrectedPanGestureRecognizer PanUpdated="Bookend_PanUpdated" />
+                <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
+            </controls:TrimThumb.GestureRecognizers>
+        </controls:TrimThumb>
+        
+        <BoxView 
+            Grid.Column="4" 
+            BackgroundColor="{x:Static resources:Colors.Snow}" 
+            Opacity="0.6" />
+        
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
+        </Grid.GestureRecognizers>
+    </Grid>
+    <!--- Because it is hard for a user to tap on the exact position bar, it is being contained in a transparent ContentView
+          The ContentView is what is actually getting moved. -->
+    <!-- On Android, micro-adjustments by tap are not possible because of the size of this ContentView. This is the bug for it:
+                https://github.com/dotnet/maui/issues/8121 
+            -->
+    <ContentView 
+        WidthRequest="{Binding PositionBarStartingPoint, Source={x:Reference This}}" 
+        x:Name="PositionBarBubble" 
+        HorizontalOptions="Start">
+        
+        <BoxView 
+            WidthRequest="{Binding PositionBarWidth, Source={x:Reference This}}" 
+            x:Name="PositionBarBar" 
+            Color="{Binding PositionBarColor, Source={x:Reference This}}" 
+            HorizontalOptions="Center" 
+            InputTransparent="True" />
+        
+        <ContentView.GestureRecognizers>
+            <controls:CorrectedPanGestureRecognizer PanUpdated="PositionBar_PanUpdated" />
+        </ContentView.GestureRecognizers>
+    </ContentView>
+</Grid>

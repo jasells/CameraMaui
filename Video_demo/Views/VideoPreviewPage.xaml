@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="Video_Demo.Views.VideoPreviewPage"
+    xmlns:vm="clr-namespace:Video_Demo.ViewModel"
+    x:DataType="vm:VideoPreviewViewModel"
+    x:Name="This"
+    xmlns:resources="clr-namespace:Camera.MAUI.Ex.Resources;assembly=Camera.MAUI.Ex"
+    Title="Video Preview Page">
+    
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior
+            Command="{Binding BackCommand}"
+            IsEnabled="True"/>
+    </Shell.BackButtonBehavior>
+    
+    <ContentPage.Content>
+        
+        <Grid
+            RowDefinitions="*,20,44,20"
+            ColumnDefinitions="16,*,16,*,16">
+            
+            <ContentView
+                Grid.Row="0"
+                Grid.Column="0"
+                Grid.ColumnSpan="5"
+                x:Name="VideoViewHolder"/>
+            
+            <Button
+                Grid.Row="2"
+                Grid.Column="1"
+                Text="{x:Static resources:Strings.StartOver}"
+                TextColor="{x:Static resources:Colors.Blackbird}"
+                FontSize="14"
+                BackgroundColor="{x:Static resources:Colors.Snow}"
+                BorderColor="{x:Static resources:Colors.Blackbird60}"
+                BorderWidth="1"
+                CornerRadius="8"
+                FontAttributes="Bold"
+                Command="{Binding BackCommand}"/>
+            
+            <Button
+                Grid.Row="2"
+                Grid.Column="3"
+                Text="{x:Static resources:Strings.SaveVideo}"
+                TextColor="{x:Static resources:Colors.Snow}"
+                FontSize="14"
+                BackgroundColor="{x:Static resources:Colors.Leaf}"
+                BorderColor="Transparent"
+                BorderWidth="0"
+                CornerRadius="8"
+                FontAttributes="Bold"
+                Command="{Binding NextCommand}" />
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

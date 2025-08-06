@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:vm="clr-namespace:Video_Demo.ViewModel"
+             xmlns:controls="clr-namespace:Camera.MAUI.Ex.Controls;assembly=Camera.MAUI.Ex"
+             xmlns:resources="clr-namespace:Camera.MAUI.Ex.Resources;assembly=Camera.MAUI.Ex"
+             x:Class="Video_Demo.Views.ThumbnailSelectionPage"
+             Title="{x:Static resources:Strings.SelectThumbnail}"
+             x:DataType="vm:ThumbnailSelectionViewModel"
+             x:Name="This">
+    <ContentPage.Content>
+        <ScrollView>
+            <VerticalStackLayout>
+                
+                <!-- Thumbnail selection layout -->
+                <VerticalStackLayout 
+                BackgroundColor="{x:Static resources:Colors.Snow}"
+                IsVisible="True">
+                    
+                    <VerticalStackLayout.Triggers>
+                        
+                        <DataTrigger 
+                            TargetType="VerticalStackLayout"
+                            Binding="{Binding DisplayVideo}"
+                            Value="True">
+                            
+                            <Setter
+                                Property="IsVisible"
+                                Value="False"/>
+                        </DataTrigger>
+                    </VerticalStackLayout.Triggers>
+
+                <StackLayout>
+                        <!--MediaPlayer="{Binding MediaPlayer}"-->
+                        <controls:VideoPlayerView
+                        x:Name="PlayerView"
+                        IsVideoPreview="False">
+                            <!-- CameraOrientation="{Binding CameraOrientation}" -->
+                            <!-- FilePath="{Binding FilePath}" -->
+                            <!-- VideoViewHeight="{Binding VideoViewHeight}" -->
+                            <!-- VideoViewWidth="{Binding VideoViewWidth}" -->
+                            
+                            <!--MediaPlayer="{Binding MediaPlayer}"-->
+                            <controls:ImageHighlightSlider
+                            x:Name="Slider"
+                            FilePath="{Binding FilePath}">
+                            
+                            <controls:ImageHighlightSlider.Behaviors>
+                                <toolkit:EventToCommandBehavior 
+                                    EventName="SeekPlayer"                                               
+                                    Command="{Binding SeekPlayerCommand}"
+                                    CommandParameter="{Binding SeekCommandParameter, Source={x:Reference Slider}}"
+                                />
+                            </controls:ImageHighlightSlider.Behaviors>
+                        </controls:ImageHighlightSlider>
+                    </controls:VideoPlayerView>
+                </StackLayout>
+
+                <HorizontalStackLayout 
+                    Margin="20" 
+                    Spacing="20" 
+                    HorizontalOptions="Center">
+                    
+                        <Button
+                        Text="{x:Static resources:Strings.Next}"
+                        WidthRequest="150"
+                        HorizontalOptions="End"
+                        TextColor="{x:Static resources:Colors.Snow}"
+                        BackgroundColor="{x:Static resources:Colors.Leaf}"
+                        Command="{Binding UploadVideoCommand }"
+                        CommandParameter="{Binding Path=FilePath}">
+                            <Button.Triggers>
+                                <DataTrigger 
+                                    TargetType="Button"
+                                    Binding="{Binding IsProcessing}"
+                                    Value="True">
+                            
+                                    <Setter
+                                        Property="Text"
+                                        Value="Uploading video..."/>
+                                    <Setter
+                                        Property="BackgroundColor"
+                                        Value="{x:Static resources:Colors.ChineseSilver}"/>
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+
+                <!-- Video hosting player layout -->
+                <VerticalStackLayout IsVisible="False">
+                    <VerticalStackLayout.Triggers>
+                        <DataTrigger 
+                            TargetType="VerticalStackLayout"
+                            Binding="{Binding DisplayVideo}"
+                            Value="True">
+                            
+                            <Setter
+                                Property="IsVisible"
+                                Value="True"/>
+                        </DataTrigger>
+                    </VerticalStackLayout.Triggers>
+                    
+                    <WebView Source="{Binding VideoUrl}"
+                             HeightRequest="300"
+                             WidthRequest="300" />
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+            
+            
+            
+        </ScrollView>
+    </ContentPage.Content>    
+</ContentPage>
