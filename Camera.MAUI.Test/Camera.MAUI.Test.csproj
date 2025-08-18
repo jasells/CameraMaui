@@ -49,6 +49,7 @@
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
 	  <CodesignKey>Apple Development: Joshua Sells (SU5MZJQ3W2)</CodesignKey>
+	  <MtouchLink>SdkOnly</MtouchLink>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(TargetFramework)'=='net9.0-ios'">
 	  <CodesignKey>iPhone Developer</CodesignKey>
