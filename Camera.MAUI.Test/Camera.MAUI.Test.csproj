@@ -50,6 +50,10 @@
 	<PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
 	  <CodesignKey>Apple Development: Joshua Sells (SU5MZJQ3W2)</CodesignKey>
 	</PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)'=='net9.0-ios'">
+	  <CodesignKey>iPhone Developer</CodesignKey>
+	  <ProvisioningType>manual</ProvisioningType>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<!-- App Icon -->
