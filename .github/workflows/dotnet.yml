@@ -33,14 +33,14 @@ jobs:
         dotnet workload restore Camera.MAUI.Test/Camera.MAUI.Test.csproj
         dotnet restore Camera.MAUI.Test/Camera.MAUI.Test.csproj
     - name: Build Lib
-      run: dotnet build Camera.MAUI/Camera.MAUI.csproj --no-restore -c Release -p:Version=$(git describe --tags)
+      run: dotnet build Camera.MAUI/Camera.MAUI.csproj --no-restore -c Release -p:Version=0.0.1
     - name: Upload package
       uses: actions/upload-artifact@v4
       with:
         name: nupkg
         path: ./Camera.MAUI/bin/Release/*.nupkg
     - name: Build Test
-      run: dotnet build Camera.MAUI.Test/Camera.MAUI.Test.csproj -c Release -p:Version=$(git describe --tags)
+      run: dotnet build Camera.MAUI.Test/Camera.MAUI.Test.csproj -c Release -p:Version=0.0.1
 
   macBuild:
     runs-on: macos-15
@@ -63,7 +63,7 @@ jobs:
     - name: Install Android tools
       run: ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platforms;android-34" "build-tools;34.0.0" "platform-tools"
     - name: Build Lib
-      run: dotnet build Camera.MAUI/Camera.MAUI.csproj --no-restore -c Release -p:Version=$(git describe --tags)
+      run: dotnet build Camera.MAUI/Camera.MAUI.csproj --no-restore -c Release -p:Version=0.0.1
     - name: Build Test
       run: dotnet build Camera.MAUI.Test/Camera.MAUI.Test.csproj --no-restore -c Release -p:Version=$(git describe --tags)
 
