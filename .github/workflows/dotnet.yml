@@ -30,7 +30,7 @@ jobs:
         java-version: '11'
     - name: Restore workloads & dependencies
       run: |
-        dotnet workload restore Camera.MAUI.Test/Camera.MAUI.Test.csproj --version 9.0.100
+        dotnet workload restore Camera.MAUI.Test/Camera.MAUI.Test.csproj --version 9.0.200
         dotnet nuget restore Camera.MAUI.Test/Camera.MAUI.Test.csproj
     - name: Build Lib
       run: dotnet build Camera.MAUI/Camera.MAUI.csproj --no-restore -c Release -p:Version=0.0.1
@@ -58,7 +58,7 @@ jobs:
         xcode-version: latest-stable
     - name: Restore workloads & dependencies
       run: |
-        dotnet workload restore Camera.MAUI.Test/Camera.MAUI.Test.csproj --version 9.0.100
+        dotnet workload restore Camera.MAUI.Test/Camera.MAUI.Test.csproj --version 9.0.200
         dotnet nuget restore Camera.MAUI.Test/Camera.MAUI.Test.csproj
     - name: Install Android tools
       run: ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platforms;android-34" "build-tools;34.0.0" "platform-tools"
@@ -79,7 +79,7 @@ jobs:
         dotnet-version: 9.0.200
     - name: Restore workloads & dependencies
       run: |
-        dotnet workload restore Camera.MAUI.Test/Camera.MAUI.Test.csproj --version 9.0.100
+        dotnet workload restore Camera.MAUI.Test/Camera.MAUI.Test.csproj --version 9.0.200
         dotnet nuget restore Camera.MAUI.Test/Camera.MAUI.Test.csproj
     - name: Install Android tools
       run: ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools"
