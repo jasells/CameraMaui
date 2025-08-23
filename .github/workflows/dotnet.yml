@@ -84,6 +84,6 @@ jobs:
     - name: Install Android tools
       run: ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools"
     - name: Build Lib
-      run: dotnet build Camera.MAUI/Camera.MAUI.csproj --no-restore -c Release -p:Version=$(git describe --tags)
+      run: dotnet build Camera.MAUI/Camera.MAUI.csproj --no-restore -c Release -p:Version=0.0.1
     - name: Build Test
       run: dotnet build Camera.MAUI.Test/Camera.MAUI.Test.csproj --no-restore -c Release -p:Version=0.0.1
