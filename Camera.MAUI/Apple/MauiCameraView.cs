@@ -289,11 +289,7 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
         {
             if (PreviewLayer.Connection.AutomaticallyAdjustsVideoMirroring)
                 PreviewLayer.Connection.AutomaticallyAdjustsVideoMirroring = false;
-            if (cameraView.MirroredImage)
-                PreviewLayer.Connection.VideoMirrored = true;
-            else
-                PreviewLayer.Connection.VideoMirrored = false;
-
+            UpdateTransform();
             UpdateTorch();
         }
     }
@@ -618,10 +614,12 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
         photoTaken = true;
     }
 
-    public override void LayoutSubviews()
+    private void UpdateTransform()
     {
-        base.LayoutSubviews();
-        CATransform3D transform = CATransform3D.MakeRotation(0, 0, 0, 1.0f);
+        CATransform3D transform = CATransform3D.Identity;
+        if (cameraView.MirroredImage == (cameraView.Camera?.Position == CameraPosition.Back))
+            transform = transform.Scale(-1, 1, 1);
+
         UIInterfaceOrientation orientation;
         if (OperatingSystem.IsIOSVersionAtLeast(15))
             orientation = (UIApplication.SharedApplication.ConnectedScenes.ToArray().First(s => s is UIWindowScene) as UIWindowScene).InterfaceOrientation;
@@ -629,25 +627,32 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
             orientation = UIApplication.SharedApplication.Windows.First().WindowScene.InterfaceOrientation;
         else
             orientation = UIApplication.SharedApplication.StatusBarOrientation;
+
         switch (orientation)
         {
             case UIInterfaceOrientation.Portrait:
-                transform = CATransform3D.MakeRotation(0, 0, 0, 1.0f);
+                transform = transform.Rotate(0, 0, 0, 1.0f);
                 break;
             case UIInterfaceOrientation.PortraitUpsideDown:
-                transform = CATransform3D.MakeRotation((nfloat)Math.PI, 0, 0, 1.0f);
+                transform = transform.Rotate((nfloat)Math.PI, 0, 0, 1.0f);
                 break;
             case UIInterfaceOrientation.LandscapeRight:
                 var rotation = cameraView.Camera?.Position == CameraPosition.Back ? -Math.PI / 2 : Math.PI / 2;
-                transform = CATransform3D.MakeRotation((nfloat)rotation, 0, 0, 1.0f);
+                transform = transform.Rotate((nfloat)rotation, 0, 0, 1.0f);
                 break;
             case UIInterfaceOrientation.LandscapeLeft:
-                var rotation2 = cameraView.Camera?.Position == CameraPosition.Back ? Math.PI / 2 : -Math.PI /2;
-                transform = CATransform3D.MakeRotation((nfloat)rotation2, 0, 0, 1.0f);
+                var rotation2 = cameraView.Camera?.Position == CameraPosition.Back ? Math.PI / 2 : -Math.PI / 2;
+                transform = transform.Rotate((nfloat)rotation2, 0, 0, 1.0f);
                 break;
         }
 
         PreviewLayer.Transform = transform;
+    }
+
+    public override void LayoutSubviews()
+    {
+        base.LayoutSubviews();
+        UpdateTransform();
         PreviewLayer.Frame = Layer.Bounds;
     }
 
