@@ -7,7 +7,7 @@
 		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
 		<!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen<</TargetFrameworks> -->
 		<UseMaui>true</UseMaui>
-		<SingleProject>true</SingleProject>
+       <SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">12.2</SupportedOSPlatformVersion>
@@ -34,6 +34,11 @@
 		<Version>1.4.11</Version>
 	</PropertyGroup>
 
+  <!--allow builds with SDK 9.0.200 workloads < 9.0.200 (some early versions of 9.0.200 SDK package workload v 9.0.100, also some early versions of workload 9.0.200 ref maui packages as old as 9.0.14)-->
+  <!--The actual MINIMUM version compatibale with this lib is probably just Maui8, Maui/.Net9 isn't even needed as a target, possibly?-->
+  <PropertyGroup Condition="$([System.String]::Copy('$(TargetFramework)').Contains('net9'))">
+    <MauiVersion>9.0.21</MauiVersion>
+  </PropertyGroup>
 	<ItemGroup>
 	  <Folder Include="Platforms\iOS\" />
 	  <Folder Include="Platforms\MacCatalyst\" />
