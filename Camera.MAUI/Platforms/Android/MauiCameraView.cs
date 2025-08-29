@@ -423,8 +423,6 @@ internal class MauiCameraView : GridLayout
         try
         {
             if (started) StopCamera();
-            executorService?.Shutdown();
-            executorService?.Dispose();
             RemoveAllViews();
             textureView?.Dispose();
             timer?.Dispose();
@@ -920,6 +918,12 @@ internal class MauiCameraView : GridLayout
                 cameraView.cameraDevice = camera;
                 cameraView.StartPreview();
             }
+        }
+
+        public override void OnClosed(CameraDevice camera)
+        {
+            cameraView.executorService?.Shutdown();
+            cameraView.executorService?.Dispose();
         }
 
         public override void OnDisconnected(CameraDevice camera)
