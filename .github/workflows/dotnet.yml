@@ -28,8 +28,11 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '11'
-    - name: Restore dependencies
-      run: dotnet restore
+    - name: Restore workloads & dependencies
+      run: |
+        dotnet workload restore
+        dotnet workload list
+        dotnet restore
     - name: Build Lib
       run: dotnet build Camera.MAUI/Camera.MAUI.csproj --no-restore -c Release -p:Version=$(git describe --tags)
     - name: Upload package
@@ -57,6 +60,7 @@ jobs:
     - name: Restore workloads & dependencies
       run: |
         dotnet workload restore
+        dotnet workload list
         dotnet restore
     - name: Install Android tools
       run: ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platforms;android-34" "build-tools;34.0.0" "platform-tools"
@@ -78,6 +82,7 @@ jobs:
     - name: Restore workloads & dependencies
       run: |
         dotnet workload restore
+        dotnet workload list
         dotnet restore
     - name: Install Android tools
       run: ${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools"
