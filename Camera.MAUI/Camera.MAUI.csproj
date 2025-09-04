@@ -39,6 +39,9 @@
   <PropertyGroup Condition="$([System.String]::Copy('$(TargetFramework)').Contains('net9'))">
     <MauiVersion>9.0.21</MauiVersion>
   </PropertyGroup>
+  <ItemGroup Condition="$([System.String]::Copy('$(TargetFramework)').Contains('windows'))">
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250205002" />
+  </ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Platforms\iOS\" />
 	  <Folder Include="Platforms\MacCatalyst\" />
