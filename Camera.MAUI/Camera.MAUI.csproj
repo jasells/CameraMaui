@@ -34,6 +34,10 @@
 		<Version>1.4.11</Version>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="$(TargetFramework.Contains('net9'))">
+		<MauiVersion>9.0.51</MauiVersion>
+	</PropertyGroup>
+
 	<ItemGroup>
 	  <Folder Include="Platforms\iOS\" />
 	  <Folder Include="Platforms\MacCatalyst\" />
