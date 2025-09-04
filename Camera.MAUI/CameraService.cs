@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 using Debug = System.Diagnostics.Debug;
 namespace Camera.MAUI;
 
-public class CameraService : CommunityToolkit.Mvvm.ComponentModel.ObservableObject//, ICameraService 
+public class CameraService : Internals.NotifyPropertyChangedBase
 {
     public string RawOrientation
     {
