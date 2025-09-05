@@ -17,6 +17,7 @@ using Android.OS;
 using Android.Renderscripts;
 using RectF = Android.Graphics.RectF;
 using Android.Content.Res;
+using DebugOut = System.Diagnostics.Debug;
 
 namespace Camera.MAUI.Platforms.Android;
 
@@ -139,12 +140,15 @@ internal class MauiCameraView : GridLayout
                 }
             }
             //Microphone = Micros.FirstOrDefault();
-            executorService = Executors.NewSingleThreadExecutor();
+            executorService = CameraExecutor;
 
             initiated = true;
             cameraView.RefreshDevices();
         }
     }
+
+    private IExecutorService CameraExecutor => executorService ??= 
+                                                        Executors.NewSingleThreadExecutor();
 
     internal async Task<CameraResult> StartRecordingAsync(string file, Microsoft.Maui.Graphics.Size Resolution, int frameRate, int bitRate, bool withAudio)
     {
@@ -231,7 +235,7 @@ internal class MauiCameraView : GridLayout
                         mediaRecorder.Prepare();
 
                         if (OperatingSystem.IsAndroidVersionAtLeast(28))
-                            cameraManager.OpenCamera(cameraView.Camera.DeviceId, executorService, stateListener);
+                            cameraManager.OpenCamera(cameraView.Camera.DeviceId, CameraExecutor, stateListener);
                         else
                             cameraManager.OpenCamera(cameraView.Camera.DeviceId, stateListener, null);
                         started = true;
@@ -286,7 +290,7 @@ internal class MauiCameraView : GridLayout
         sessionCallback = new PreviewCaptureStateCallback(this);
         if (OperatingSystem.IsAndroidVersionAtLeast(28))
         {
-            SessionConfiguration config = new((int)SessionType.Regular, surfaces, executorService, sessionCallback);
+            SessionConfiguration config = new((int)SessionType.Regular, surfaces, CameraExecutor, sessionCallback);
             cameraDevice.CreateCaptureSession(config);
         }
         else
@@ -344,15 +348,16 @@ internal class MauiCameraView : GridLayout
                         imgReader.SetOnImageAvailableListener(photoListener, backgroundHandler);
 
                         if (OperatingSystem.IsAndroidVersionAtLeast(28))
-                            cameraManager.OpenCamera(cameraView.Camera.DeviceId, executorService, stateListener);
+                            cameraManager.OpenCamera(cameraView.Camera.DeviceId, CameraExecutor, stateListener);
                         else
                             cameraManager.OpenCamera(cameraView.Camera.DeviceId, stateListener, null);
                         timer.Start();
 
                         started = true;
                     }
-                    catch
+                    catch (Exception camEx)
                     {
+                        DebugOut.WriteLine(camEx.ToString());
                         result = CameraResult.AccessError;
                     }
                 }
@@ -924,6 +929,7 @@ internal class MauiCameraView : GridLayout
         {
             cameraView.executorService?.Shutdown();
             cameraView.executorService?.Dispose();
+            cameraView.executorService = null; // so we can tell if we need a new one?
         }
 
         public override void OnDisconnected(CameraDevice camera)
