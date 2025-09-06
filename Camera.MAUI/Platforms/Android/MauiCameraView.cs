@@ -24,7 +24,7 @@ namespace Camera.MAUI.Platforms.Android;
 internal class MauiCameraView : GridLayout
 {
     private readonly CameraView cameraView;
-    private IExecutorService executorService;
+    private IExecutorService? executorService;
     private bool started = false;
     private int frames = 0;
     private bool initiated = false;
@@ -148,7 +148,7 @@ internal class MauiCameraView : GridLayout
     }
 
     private IExecutorService CameraExecutor => executorService ??= 
-                                                        Executors.NewSingleThreadExecutor();
+                                                Executors.NewSingleThreadExecutor();
 
     internal async Task<CameraResult> StartRecordingAsync(string file, Microsoft.Maui.Graphics.Size Resolution, int frameRate, int bitRate, bool withAudio)
     {
@@ -442,10 +442,10 @@ internal class MauiCameraView : GridLayout
             Bitmap bitmap = TakeSnap();
             if (bitmap != null)
             {
-                System.Diagnostics.Debug.WriteLine($"Processing QR ({bitmap.Width}x{bitmap.Height}) " + DateTime.Now.ToString("mm:ss:fff"));
+                DebugOut.WriteLine($"Processing QR ({bitmap.Width}x{bitmap.Height}) " + DateTime.Now.ToString("mm:ss:fff"));
                 cameraView.DecodeBarcode(bitmap);
                 bitmap.Dispose();
-                System.Diagnostics.Debug.WriteLine("QR Processed " + DateTime.Now.ToString("mm:ss:fff"));
+                DebugOut.WriteLine("QR Processed " + DateTime.Now.ToString("mm:ss:fff"));
             }
             lock (cameraView.currentThreadsLocker) cameraView.currentThreads--;
         });
@@ -585,7 +585,7 @@ internal class MauiCameraView : GridLayout
             }
             catch (Java.Lang.Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine(ex.StackTrace);
+                DebugOut.WriteLine(ex.StackTrace);
             }
         }
         return stream;
