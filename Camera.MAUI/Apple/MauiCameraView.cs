@@ -30,7 +30,7 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
     private bool started = false;
     private CIImage lastCapture;
     private readonly object lockCapture = new();
-    private readonly DispatchQueue cameraDispacher;
+    private readonly DispatchQueue cameraDispatcher;
     private int frames = 0, currentFrames = 0;
     private bool initiated = false;
     private bool snapping = false;
@@ -59,9 +59,9 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
         videoDataOutput.WeakVideoSettings = videoSettings;
         videoDataOutput.AlwaysDiscardsLateVideoFrames = true;
         photoOutput = new AVCapturePhotoOutput();
-        cameraDispacher = new DispatchQueue("CameraDispacher");
+        cameraDispatcher = new DispatchQueue("CameraDispatcher");
 
-        videoDataOutput.SetSampleBufferDelegate(this, cameraDispacher);
+        videoDataOutput.SetSampleBufferDelegate(this, cameraDispatcher);
         orientationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIDevice.OrientationDidChangeNotification, OrientationChanged);
         InitDevices();
     }
