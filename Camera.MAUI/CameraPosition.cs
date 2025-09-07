@@ -4,5 +4,5 @@ public enum CameraPosition
 {
     Back,
     Front,
-    Unknow
+    Unknown
 }

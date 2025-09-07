@@ -102,7 +102,7 @@ internal class MauiCameraView : GridLayout
                 else
                 {
                     cameraInfo.Name = "Camera " + id;
-                    cameraInfo.Position = CameraPosition.Unknow;
+                    cameraInfo.Position = CameraPosition.Unknown;
                 }
                 cameraInfo.MaxZoomFactor = (float)(chars.Get(CameraCharacteristics.ScalerAvailableMaxDigitalZoom) as Java.Lang.Number);
                 cameraInfo.HasFlashUnit = (bool)(chars.Get(CameraCharacteristics.FlashInfoAvailable) as Java.Lang.Boolean);
