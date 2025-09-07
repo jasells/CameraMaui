@@ -435,7 +435,8 @@ internal class MauiCameraView : GridLayout
         }
         catch { }
     }
-    private void ProccessQR()
+
+    private void ProcessQR()
     {
         Task.Run(() =>
         {
@@ -450,6 +451,7 @@ internal class MauiCameraView : GridLayout
             lock (cameraView.currentThreadsLocker) cameraView.currentThreads--;
         });
     }
+
     private void RefreshSnapShot()
     {
         cameraView.RefreshSnapshot(GetSnapShot(cameraView.AutoSnapShotFormat, true));
@@ -477,7 +479,7 @@ internal class MauiCameraView : GridLayout
                 }
                 if (processQR)
                 {
-                    ProccessQR();
+                    ProcessQR();
                     frames = 0;
                 }
             }

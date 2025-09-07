@@ -529,7 +529,8 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
 
         return croppedImage;
     }
-    private void ProccessQR()
+
+    private void ProcessQR()
     {
         MainThread.BeginInvokeOnMainThread(() =>
         {
@@ -550,6 +551,7 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
             }
         });
     }
+
     private void ProcessImage(CIImage capture)
     {        
         new Task(() =>
@@ -574,7 +576,7 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
                 }
                 if (processQR)
                 {
-                    ProccessQR();
+                    ProcessQR();
                     currentFrames = 0;
                     lock (cameraView.currentThreadsLocker) cameraView.currentThreads--;
                 }
