@@ -76,7 +76,7 @@
     <Message Text="Running custom clean up obj... $(ProjectDir)obj" />
     <Exec Command="rmdir /s /q $(ProjectDir)obj" />
   </Target>
-  <Target Name="CustomCleanMac" AfterTargets="Clean" Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+  <Target Name="CustomCleanMac" AfterTargets="Clean" Condition="$([MSBuild]::IsOSPlatform('OSX')) Or [MSBuild]::IsOSPlatform('Linux'))">
     <Message Text="Running custom clean up bin... $(ProjectDir)bin" />
     <Exec Command="rm -R $(ProjectDir)bin" ContinueOnError="true" />
     <Message Text="Running custom clean up obj... $(ProjectDir)obj" />
