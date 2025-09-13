@@ -117,7 +117,7 @@ public sealed partial class MauiCameraView : UserControl, IDisposable
                 cameraView.Cameras.Clear();
                 foreach (var s in sGroups)
                 {
-                    CameraPosition position = CameraPosition.Unknow;
+                    CameraPosition position = CameraPosition.Unknown;
                     var device = vDevices.FirstOrDefault(vd => vd.Id == s.Id);
                     if (device != null)
                     {
@@ -126,7 +126,7 @@ public sealed partial class MauiCameraView : UserControl, IDisposable
                             {
                                 Panel.Front => CameraPosition.Front,
                                 Panel.Back => CameraPosition.Back,
-                                _ => CameraPosition.Unknow
+                                _ => CameraPosition.Unknown
                             };
                     }
                     mediaCapture = new MediaCapture();

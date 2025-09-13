@@ -30,7 +30,7 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
     private bool started = false;
     private CIImage lastCapture;
     private readonly object lockCapture = new();
-    private readonly DispatchQueue cameraDispacher;
+    private readonly DispatchQueue cameraDispatcher;
     private int frames = 0, currentFrames = 0;
     private bool initiated = false;
     private bool snapping = false;
@@ -59,9 +59,9 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
         videoDataOutput.WeakVideoSettings = videoSettings;
         videoDataOutput.AlwaysDiscardsLateVideoFrames = true;
         photoOutput = new AVCapturePhotoOutput();
-        cameraDispacher = new DispatchQueue("CameraDispacher");
+        cameraDispatcher = new DispatchQueue("CameraDispatcher");
 
-        videoDataOutput.SetSampleBufferDelegate(this, cameraDispacher);
+        videoDataOutput.SetSampleBufferDelegate(this, cameraDispatcher);
         orientationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIDevice.OrientationDidChangeNotification, OrientationChanged);
         InitDevices();
     }
@@ -80,8 +80,8 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
                     deviceTypes = new AVCaptureDeviceType[] { AVCaptureDeviceType.BuiltInWideAngleCamera, AVCaptureDeviceType.BuiltInUltraWideCamera, AVCaptureDeviceType.BuiltInDualWideCamera, AVCaptureDeviceType.BuiltInTripleCamera, AVCaptureDeviceType.BuiltInTelephotoCamera };
                 else
                     deviceTypes = new AVCaptureDeviceType[] { AVCaptureDeviceType.BuiltInWideAngleCamera, AVCaptureDeviceType.BuiltInTelephotoCamera };
-                var deviceDescoverySession = AVCaptureDeviceDiscoverySession.Create(deviceTypes, AVMediaTypes.Video, AVCaptureDevicePosition.Unspecified);
-                camDevices = deviceDescoverySession.Devices;
+                var deviceDiscoverySession = AVCaptureDeviceDiscoverySession.Create(deviceTypes, AVMediaTypes.Video, AVCaptureDevicePosition.Unspecified);
+                camDevices = deviceDiscoverySession.Devices;
                 cameraView.Cameras.Clear();
                 foreach (var device in camDevices)
                 {
@@ -89,7 +89,7 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
                     {
                         AVCaptureDevicePosition.Back => CameraPosition.Back,
                         AVCaptureDevicePosition.Front => CameraPosition.Front,
-                        _ => CameraPosition.Unknow
+                        _ => CameraPosition.Unknown
                     };                    
                     cameraView.Cameras.Add(new CameraInfo
                     {
@@ -103,7 +103,7 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
                         AvailableResolutions = new() { new(1920, 1080), new(1280, 720), new(640, 480), new(352, 288) }
                     });
                 }
-                deviceDescoverySession.Dispose();
+                deviceDiscoverySession.Dispose();
                 var aSession = AVCaptureDeviceDiscoverySession.Create(new AVCaptureDeviceType[] { AVCaptureDeviceType.BuiltInMicrophone }, AVMediaTypes.Audio, AVCaptureDevicePosition.Unspecified);
                 micDevices = aSession.Devices;
                 cameraView.Microphones.Clear();
@@ -529,7 +529,8 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
 
         return croppedImage;
     }
-    private void ProccessQR()
+
+    private void ProcessQR()
     {
         MainThread.BeginInvokeOnMainThread(() =>
         {
@@ -550,6 +551,7 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
             }
         });
     }
+
     private void ProcessImage(CIImage capture)
     {        
         new Task(() =>
@@ -574,7 +576,7 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
                 }
                 if (processQR)
                 {
-                    ProccessQR();
+                    ProcessQR();
                     currentFrames = 0;
                     lock (cameraView.currentThreadsLocker) cameraView.currentThreads--;
                 }
