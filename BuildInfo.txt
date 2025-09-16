@@ -1,0 +1,22 @@
+/// ****************************************************************************************
+/// **  The CI-CD Pipeline will use this file to auto-version and track builds/releases.  **
+/// ****************************************************************************************
+
+/// <summary>
+/// Specifies the name of the package to release.
+/// This tag and value is required for tracking in the history.json file.
+/// </summary>
+/// <example>
+/// [Package Name]
+/// My.Package
+/// </example>
+[Package Name]
+XDev.CameraMaui
+
+/// <summary>
+/// Specifies the 3 octet version of the release.  This is the versioning schema used by Nuget.
+/// This tag and value is required.
+/// This should match the native version we're linking to in the .csproj file <AndroidMavenLibrary> node.
+/// </summary>
+[Release Version]
+1.4.13

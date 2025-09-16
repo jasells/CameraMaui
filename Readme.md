@@ -3,6 +3,15 @@
 
 A Camera View control and a Barcode Endode/Decode control (based on ZXing.Net) for .NET MAUI applications.
 
+<div>Latest release <a href="https://www.nuget.org/packages/XDev.CameraMaui"> <img src="https://img.shields.io/nuget/v/XDev.CameraMaui"></a></div>
+
+<div>Latest build <a href="https://www.nuget.org/packages/XDev.CameraMaui"> <img src="https://img.shields.io/nuget/vpre/XDev.CameraMaui"></a></div>
+
+source [repo](https://xdevapps.visualstudio.com/DefaultCollection/XDev.Maui/_git/XDev.Camera.Maui) 
+
+github [mirror](https://github.com/jasells/CameraMaui) 
+
+[![Build status](https://xdevapps.visualstudio.com/DefaultCollection/XDev.Maui/_apis/build/status/XDev.Maui.ManualCrop-CI-clone)](https://xdevapps.visualstudio.com/DefaultCollection/XDev.Maui/_build/latest?definitionId=87)
 ## CameraView
 
 A ContetView control for camera management with the next properties:

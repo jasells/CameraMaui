@@ -21,14 +21,14 @@
 		<Title>Camera and Barcode encode/decode pluging for .NET MAUI Apps</Title>
 		<Description>A Camera View control and a Barcode Endode/Decode control (based on ZXing.Net) for .NET MAUI applications.</Description>
 		<Copyright></Copyright>
-		<PackageId>CameraMaui</PackageId>
-		<PackageProjectUrl>https://github.com/janusw/Camera.Maui</PackageProjectUrl>
+		<PackageId>XDev.CameraMaui</PackageId>
+		<PackageProjectUrl>https://xdevapps.visualstudio.com/DefaultCollection/XDev.Maui/_git/XDev.Camera.Maui</PackageProjectUrl>
 		<PackageIcon>camera.maui.png</PackageIcon>
 		<PackageReadmeFile>Readme.md</PackageReadmeFile>
-		<RepositoryUrl>https://github.com/janusw/Camera.Maui</RepositoryUrl>
+		<RepositoryUrl>https://xdevapps.visualstudio.com/DefaultCollection/XDev.Maui/_git/XDev.Camera.Maui</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>csharp; dotnet; cross-platform; camera; cameraview; codebar; qr; qr-decoder; codebar-encoder; codebar-decoder; camera-component; camera-view;  plugin; maui; dotnet-maui;</PackageTags>
-		<Authors>hjam40</Authors>
+		<Authors>hjam40, Janus Weil, jasells</Authors>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<Version>1.4.12</Version>
