@@ -33,6 +33,11 @@
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<Version>1.4.12</Version>
 		<Nullable>annotations</Nullable>
+
+    <!--support source-link-->
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>
+      $(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb
+    </AllowedOutputExtensionsInPackageBuildOutputFolder>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('net9'))">
