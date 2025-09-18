@@ -11,8 +11,7 @@ source [repo](https://xdevapps.visualstudio.com/DefaultCollection/XDev.Maui/_git
 
 github [mirror](https://github.com/jasells/CameraMaui) 
 
-[![Build status](https://xdevapps.visualstudio.com/DefaultCollection/XDev.Maui/_apis/build/status/XDev.Maui.ManualCrop-CI-clone)](https://xdevapps.visualstudio.com/DefaultCollection/XDev.Maui/_build/latest?definitionId=87)
-
+[![Build status](https://xdevapps.visualstudio.com/DefaultCollection/XDev.Maui/_apis/build/status/XDev.CameraMaui-CI)](https://xdevapps.visualstudio.com/DefaultCollection/XDev.Maui/_build/latest?definitionId=86)
 Forked from : https://github.com/janusw/CameraMaui
 ## CameraView
 
