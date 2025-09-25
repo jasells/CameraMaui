@@ -19,4 +19,4 @@ XDev.CameraMaui
 /// This should match the native version we're linking to in the .csproj file <AndroidMavenLibrary> node.
 /// </summary>
 [Release Version]
-1.4.13
+1.4.14
