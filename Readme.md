@@ -5,7 +5,7 @@ A Camera View control and a Barcode Endode/Decode control (based on ZXing.Net) f
 
 <div>Latest release <a href="https://www.nuget.org/packages/XDev.CameraMaui"> <img src="https://img.shields.io/nuget/v/XDev.CameraMaui"></a></div>
 
-<div>Latest build <a href="https://www.nuget.org/packages/XDev.CameraMaui"> <img src="https://img.shields.io/nuget/vpre/XDev.CameraMaui"></a></div>
+<div>Latest build &nbsp;&nbsp; <a href="https://www.nuget.org/packages/XDev.CameraMaui"> <img src="https://img.shields.io/nuget/vpre/XDev.CameraMaui"></a></div>
 
 source [repo](https://xdevapps.visualstudio.com/DefaultCollection/XDev.Maui/_git/XDev.Camera.Maui) 
 
@@ -33,7 +33,7 @@ A ContetView control for camera management with the next properties:
 
 ### Install and configure CameraView
 
-1. Download and Install [Camera.MAUI](https://www.nuget.org/packages/Camera.MAUI) NuGet package on your application.
+1. Download and Install Latest release <a href="https://www.nuget.org/packages/XDev.CameraMaui"> <img src="https://img.shields.io/nuget/v/XDev.CameraMaui"></a> NuGet package on your application.
 
 1. Initialize the plugin in your `MauiProgram.cs`:
 
