@@ -153,9 +153,19 @@ Toggle Torch
 cameraView.TorchEnabled = !cameraView.TorchEnabled;
 ```
 Set mirrored mode
+
+**Notes for v 1.4.14 and later:**
+- All platforms have FrontCamera with this true by default. BackCamera with this false by default.
+- The value sticks to the camera (CameraInfo instance) so if you change the CameraView.MirroredImage property, the value is set to the currently displayed camera (CameraInfo) available via CameraView.Camera.)
+- In most cases, you won't need to set this property unless you want to override the default behavior.
 ```csharp
 cameraView.MirroredImage = true;
+// or
+cameraInfo.IsMirrored = true;
+// or
+cameraView.Camera.IsMirrored = true;
 ```
+
 Set zoom factor
 ```csharp
 if (cameraView.MaxZoomFactor >= 2.5f)
@@ -243,7 +253,7 @@ The control has several binding properties for take an snapshot:
   AutoStartRecording="{Binding AutoStartRecording}"/>
   ```
 
-You have a complete example of MVVM in [MVVM Example](https://github.com/hjam40/Camera.MAUI/tree/master/Camera.MAUI.Test/MVVM)
+You have a complete example of MVVM in [MVVM Example](https://xdevapps.visualstudio.com/DefaultCollection/XDev.Maui/_git/XDev.Camera.Maui?path=/Camera.MAUI.Test/MVVM)
 
 
 Enable and Handle barcodes detection:

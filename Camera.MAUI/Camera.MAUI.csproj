@@ -22,8 +22,7 @@
 		<Description>A Camera View control and a Barcode Endode/Decode control (based on ZXing.Net) for .NET MAUI applications.</Description>
     <PackageReleaseNotes>
 
-      - added Source Link
-      - Android: fixed issue where video rotation was not correct in some cases see https://github.com/janusw/CameraMaui/issues/50
+      - Cameras' mirrored state now tracks the camera and is reflected in the CameraView.MirroredImage property, as well as CameraInfo.IsMirrored and can be changed by either object, see readme for more details.
     </PackageReleaseNotes>
     <Copyright></Copyright>
 		<PackageId>XDev.CameraMaui</PackageId>
