@@ -11,6 +11,7 @@ using System.Collections.Specialized;
 using Camera.MAUI.ZXingHelper;
 using CommunityToolkit.Maui.Views;
 using System.Diagnostics;
+using CommunityToolkit.Mvvm.Input;
 
 namespace Camera.MAUI.Test;
 
@@ -22,12 +23,35 @@ public class CameraViewModel : INotifyPropertyChanged
         get => camera;
         set
         {
-            camera = value;
-            OnPropertyChanged(nameof(Camera));
-            AutoStartPreview = false;
-            OnPropertyChanged(nameof(AutoStartPreview));
-            AutoStartPreview = true;
-            OnPropertyChanged(nameof(AutoStartPreview));
+            // this is where android is crashing when switching cams...
+            //camera = value;
+            //OnPropertyChanged(nameof(Camera));
+            //AutoStartPreview = false; // this property needs to be deprecated due to the async issue, or can we move this logic there?
+            //OnPropertyChanged(nameof(AutoStartPreview));
+            //AutoStartPreview = true;
+            //OnPropertyChanged(nameof(AutoStartPreview));
+
+            // this fixes Android crash, but we should try to move this out of app-code into lib?
+            // can't make a setter async, so use MainThread
+            // I think this whole block could move internal to the CameraView control on CameraChanged,
+            // checking the AutoStartPreview value to see if it should restart?
+            MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                try
+                {
+                    // to be extra-safe, we could disable the picker here, until done swapping...
+                    // because starting/stopping camera is async (at least on Android),
+                    // we need to await the stop before changing cams
+                    await StopCamera.ExecuteAsync(null);
+                    camera = value;
+                    OnPropertyChanged(nameof(Camera));
+                    await StartCamera.ExecuteAsync(null);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"CameraViewModel Camera set exception: {ex.Message}");
+                }
+            });
         }
     }
     private ObservableCollection<CameraInfo> cameras = new();
@@ -120,8 +144,8 @@ public class CameraViewModel : INotifyPropertyChanged
             }
         }
     }
-    public Command StartCamera { get; set; }
-    public Command StopCamera { get; set; }
+    public AsyncRelayCommand StartCamera { get; set; }
+    public AsyncRelayCommand StopCamera { get; set; }
     public Command TakeSnapshotCmd { get; set; }
     public string RecordingFile { get; set; }
     public Command StartRecording { get; set; }
@@ -146,16 +170,12 @@ public class CameraViewModel : INotifyPropertyChanged
             TryInverted = true
         };
         OnPropertyChanged(nameof(BarCodeOptions));
-        StartCamera = new Command(() =>
-        {
-            AutoStartPreview = true;
-            OnPropertyChanged(nameof(AutoStartPreview));
-        });
-        StopCamera = new Command(() =>
-        {
-            AutoStartPreview = false;
-            OnPropertyChanged(nameof(AutoStartPreview));
-        });
+        //StartCamera = new Command(() =>
+        //{
+        //    AutoStartPreview = true;
+        //    OnPropertyChanged(nameof(AutoStartPreview));
+        //});
+        //StopCamera = new AsyncRelayCommand();
         TakeSnapshotCmd = new Command(() =>
         {
             TakeSnapshot = false;
