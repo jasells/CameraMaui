@@ -162,7 +162,9 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
                         MinZoomFactor = (float)device.MinAvailableVideoZoomFactor,
                         MaxZoomFactor = (float)device.MaxAvailableVideoZoomFactor,
                         HorizontalViewAngle = device.ActiveFormat.VideoFieldOfView * MathF.PI / 180,
-                        AvailableResolutions = new() { new(1920, 1080), new(1280, 720), new(640, 480), new(352, 288) }
+                        AvailableResolutions = new() { new(1920, 1080), new(1280, 720), new(640, 480), new(352, 288) },
+                        //default the front camera to mirrored
+                        IsMirrored = position == CameraPosition.Front,
                     });
                 }
                 deviceDiscoverySession.Dispose();
@@ -586,7 +588,7 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
         y = (nfloat)((originalImage.Size.Height - height) / 2.0);
 
         UIGraphics.BeginImageContextWithOptions(originalImage.Size, false, 1);
-        if (cameraView.MirroredImage)
+        if (cameraView.Camera?.IsMirrored == true)
         {
             var context = UIGraphics.GetCurrentContext();
             context.ScaleCTM(-1, 1);
@@ -688,7 +690,7 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
     private void UpdateTransform()
     {
         CATransform3D transform = CATransform3D.Identity;
-        if (cameraView.MirroredImage == (cameraView.Camera?.Position == CameraPosition.Back))
+        if (cameraView.Camera?.IsMirrored == true)
             transform = transform.Scale(-1, 1, 1);
 
         UIInterfaceOrientation orientation;
