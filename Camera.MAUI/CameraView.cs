@@ -1,6 +1,7 @@
 ﻿using Camera.MAUI.ZXingHelper;
 using Microsoft.Maui.Controls;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using ZXing;
 using static Microsoft.Maui.ApplicationModel.Permissions;
@@ -23,11 +24,16 @@ public class CameraView : View, ICameraView
     public static readonly BindableProperty TorchEnabledProperty = BindableProperty.Create(nameof(TorchEnabled), typeof(bool), typeof(CameraView), false);
     public static readonly BindableProperty CamerasProperty = BindableProperty.Create(nameof(Cameras), typeof(ObservableCollection<CameraInfo>), typeof(CameraView), new ObservableCollection<CameraInfo>());
     public static readonly BindableProperty NumCamerasDetectedProperty = BindableProperty.Create(nameof(NumCamerasDetected), typeof(int), typeof(CameraView), 0);
-    public static readonly BindableProperty CameraProperty = BindableProperty.Create(nameof(Camera), typeof(CameraInfo), typeof(CameraView), null, propertyChanged:CameraChanged);
+    public static readonly BindableProperty CameraProperty = 
+                   BindableProperty.Create(nameof(Camera),
+                                           typeof(CameraInfo),
+                                           typeof(CameraView),
+                                           null,
+                                           propertyChanged:CameraChanged);
     public static readonly BindableProperty MicrophonesProperty = BindableProperty.Create(nameof(Microphones), typeof(ObservableCollection<MicrophoneInfo>), typeof(CameraView), new ObservableCollection<MicrophoneInfo>());
     public static readonly BindableProperty NumMicrophonesDetectedProperty = BindableProperty.Create(nameof(NumMicrophonesDetected), typeof(int), typeof(CameraView), 0);
     public static readonly BindableProperty MicrophoneProperty = BindableProperty.Create(nameof(Microphone), typeof(MicrophoneInfo), typeof(CameraView), null);
-    public static readonly BindableProperty MirroredImageProperty = BindableProperty.Create(nameof(MirroredImage), typeof(bool), typeof(CameraView), false);
+    public static readonly BindableProperty MirroredImageProperty = BindableProperty.Create(nameof(MirroredImage), typeof(bool), typeof(CameraView), false, defaultBindingMode: BindingMode.TwoWay, propertyChanged: MirrorStateChanged);
     public static readonly BindableProperty BarCodeDetectionEnabledProperty = BindableProperty.Create(nameof(BarCodeDetectionEnabled), typeof(bool), typeof(CameraView), false);
     public static readonly BindableProperty BarCodeDetectionFrameRateProperty = BindableProperty.Create(nameof(BarCodeDetectionFrameRate), typeof(int), typeof(CameraView), 10);
     public static readonly BindableProperty BarCodeOptionsProperty = BindableProperty.Create(nameof(BarCodeOptions), typeof(BarcodeDecodeOptions), typeof(CameraView), new BarcodeDecodeOptions(), propertyChanged:BarCodeOptionsChanged);
@@ -373,12 +379,47 @@ public class CameraView : View, ICameraView
     }
     private static void CameraChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        if (newValue != null && oldValue != newValue && bindable is CameraView cameraView && newValue is CameraInfo)
+        if (bindable is CameraView cameraView)
         {
-            cameraView.OnPropertyChanged(nameof(MinZoomFactor));
-            cameraView.OnPropertyChanged(nameof(MaxZoomFactor));
+            if (newValue is CameraInfo camInfo)
+            {
+                cameraView.OnPropertyChanged(nameof(MinZoomFactor));
+                cameraView.OnPropertyChanged(nameof(MaxZoomFactor));
+
+                // keep the MirroredImage property in sync with the camera info, for initial/default state
+                cameraView.MirroredImage = camInfo.IsMirrored;
+                camInfo.PropertyChanged += cameraView.CameraIsMirroredChanged;
+            }
+
+            if (oldValue is CameraInfo cam)
+            {
+                cam.PropertyChanged -= cameraView.CameraIsMirroredChanged;
+            }
         }
     }
+
+    /// <summary>
+    /// Allows app-code to bind to the <see cref="Camera"/> property to control the mirrored state of the camera and cameraView.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void CameraIsMirroredChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(CameraInfo.IsMirrored))
+        {
+            MirroredImage = Camera.IsMirrored;
+        }
+    }
+
+    private static void MirrorStateChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is CameraView cameraView)
+        {
+            // allow application to override the default mirrored state of the camera
+            cameraView.Camera.IsMirrored = (bool)newValue;
+        }
+    }
+
     private static void TakeAutoSnapShotChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if ((bool)newValue && !(bool)oldValue && bindable is CameraView cameraView)

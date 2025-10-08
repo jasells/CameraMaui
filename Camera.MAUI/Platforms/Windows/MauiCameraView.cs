@@ -48,9 +48,9 @@ public sealed partial class MauiCameraView : UserControl, IDisposable
 
     internal void UpdateMirroredImage()
     {
-        if (cameraView != null)
+        if (cameraView?.Camera != null)
         {
-            if(cameraView.MirroredImage)
+            if(cameraView.Camera.IsMirrored)
                 flowDirection = Microsoft.UI.Xaml.FlowDirection.RightToLeft;
             else
                 flowDirection = Microsoft.UI.Xaml.FlowDirection.LeftToRight;
@@ -144,6 +144,7 @@ public sealed partial class MauiCameraView : UserControl, IDisposable
                         Name = s.DisplayName,
                         DeviceId = s.Id,
                         Position = position,
+                        IsMirrored = position == CameraPosition.Front,
                         HasFlashUnit = frameSource.Controller.VideoDeviceController.FlashControl.Supported,
                         MinZoomFactor = frameSource.Controller.VideoDeviceController.ZoomControl.Supported ? frameSource.Controller.VideoDeviceController.ZoomControl.Min : 1f,
                         MaxZoomFactor = frameSource.Controller.VideoDeviceController.ZoomControl.Supported ? frameSource.Controller.VideoDeviceController.ZoomControl.Max : 1f,
