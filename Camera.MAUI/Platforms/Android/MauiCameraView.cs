@@ -91,7 +91,6 @@ internal class MauiCameraView : GridLayout
                 {
                     cameraInfo.Name = "Front Camera";
                     cameraInfo.Position = CameraPosition.Front;
-                    cameraInfo.IsMirrored = true; // mirror front/user cam by default
                 }
                 else
                 {
@@ -697,15 +696,12 @@ internal class MauiCameraView : GridLayout
     }
     public void UpdateMirroredImage()
     {
-        if (cameraView?.Camera == null || textureView == null) return;
-
-        if (cameraView.Camera.Position == CameraPosition.Front)
+        if (cameraView != null && textureView != null)
         {
-            textureView.ScaleX = cameraView.Camera.IsMirrored ? 1 : -1;
-        }
-        else
-        {
-            textureView.ScaleX = cameraView.Camera.IsMirrored ? -1 : 1;
+            if (cameraView.MirroredImage)
+                textureView.ScaleX = -1;
+            else
+                textureView.ScaleX = 1;
         }
     }
     internal void UpdateTorch()
