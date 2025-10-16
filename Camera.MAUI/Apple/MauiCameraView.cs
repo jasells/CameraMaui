@@ -13,11 +13,14 @@ using UIKit;
 
 namespace Camera.MAUI.Platforms.Apple;
 
+using Debug = System.Diagnostics.Debug;
+
 internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDelegate, IAVCaptureFileOutputRecordingDelegate, IAVCapturePhotoCaptureDelegate
 {
     private AVCaptureDevice[] camDevices;
     private AVCaptureDevice[] micDevices;
     private readonly CameraView cameraView;
+    private readonly CameraService _camService;
     private readonly AVCaptureVideoPreviewLayer PreviewLayer;
     private readonly AVCaptureVideoDataOutput videoDataOutput;
     private AVCaptureMovieFileOutput recordOutput;
@@ -38,10 +41,47 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
     private bool photoError = false;
     private UIImage photo;
     private NSObject orientationObserver;
+    private AVCaptureVideoOrientation _deviceOrientation = AVCaptureVideoOrientation.Portrait;
 
-    public MauiCameraView(CameraView cameraView)
+    public MauiCameraView(CameraView cameraView, CameraService camService)
     {
         this.cameraView = cameraView;
+        _camService = camService;
+        camService.StartAccelerometer();
+
+        camService.PropertyChanged += (sender, e) =>
+        {
+            if (e.PropertyName != nameof(CameraService.DeviceOrientationAngle)) return;
+
+            Debug.WriteLine($"==== iOS VideoOrientation: {(AVCaptureVideoOrientation)UIDevice.CurrentDevice.Orientation}");
+            int angle = CheckOrientation();
+
+            // these values are relative to the device's POV, not the user's, if landscape values represent
+            // the end of the phone with the camera.
+            if (angle == 90)
+            {
+                _deviceOrientation = AVCaptureVideoOrientation.Portrait;
+            }
+            else if (angle == 270)
+            {
+                _deviceOrientation = AVCaptureVideoOrientation.PortraitUpsideDown;
+            }
+            else if (angle == 0)
+            {
+                // this is the camera-end of the phone to the user's left, the _phone's_ right.
+                _deviceOrientation = AVCaptureVideoOrientation.LandscapeRight;
+            }
+            else if (angle == 180)
+            {
+                // this is the camera-end of the phone to the user's right, the _phone's_ left.
+                _deviceOrientation = AVCaptureVideoOrientation.LandscapeLeft;
+            }
+            else
+            {
+                _deviceOrientation = AVCaptureVideoOrientation.Portrait;
+            }
+            Debug.WriteLine($"==== internal tracked orientation: {_deviceOrientation}");
+        };
 
         captureSession = new AVCaptureSession
         {
@@ -65,6 +105,28 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
         orientationObserver = NSNotificationCenter.DefaultCenter.AddObserver(UIDevice.OrientationDidChangeNotification, OrientationChanged);
         InitDevices();
     }
+
+    // 0=landscape left, 90=portrait(up), 180=landscape right, 270=upside down (rear cam)
+    static readonly int[] degrees = { 0, 90, 180, 270 };
+
+    /// <summary>
+    /// We want to map the raw device orientation to the expected window orientation in case app-orientation is locked.
+    /// Uses accelerometer to determine device orientation in degrees (0 = landscape with "top"/camera-end of phone to user-left)
+    /// </summary>
+    /// <returns></returns>
+    private int CheckOrientation()
+    {
+        float angle = _camService.DeviceOrientationAngle;
+        // Map angle to nearest 0, 90, 180, 270 degrees
+        uint index = (uint)Math.Round(angle / 90.0f) % 4u;
+        int deviceOrientation = degrees[index];
+
+        Debug.WriteLine($"Device orientation angle: {angle:F2}°, mapped: {deviceOrientation}°");
+
+        // Return the mapped degrees for use as orientation hint for camera when recording
+        return deviceOrientation;
+    }
+
     private void OrientationChanged(NSNotification notification)
     {
         LayoutSubviews();
@@ -155,7 +217,14 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
                         captureSession.AddOutput(recordOutput);
 
                         var movieFileOutputConnection = recordOutput.Connections[0];
-                        movieFileOutputConnection.VideoOrientation = (AVCaptureVideoOrientation)UIDevice.CurrentDevice.Orientation;
+                        //movieFileOutputConnection.VideoOrientation = (AVCaptureVideoOrientation)UIDevice.CurrentDevice.Orientation;
+                        movieFileOutputConnection.VideoOrientation = _deviceOrientation;
+
+                        // **todo: check the obsolete warnings here, maybe related?
+                        Debug.WriteLine($"==== iOS VideoOrientation: {movieFileOutputConnection.VideoOrientation}");
+                        Debug.WriteLine($"==== Maui Orientation: {DeviceDisplay.Current.MainDisplayInfo.Orientation}");
+                        Debug.WriteLine($"==== Device orientation: {_camService.DeviceOrientationAngle}");
+
                         captureSession.StartRunning();
 
                         //Below was causing issues on .net 8

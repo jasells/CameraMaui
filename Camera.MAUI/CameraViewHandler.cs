@@ -29,8 +29,11 @@ internal partial class CameraViewHandler : ViewHandler<CameraView, PlatformView>
     protected override PlatformView CreatePlatformView() 
                                     => new(Context,
                                             VirtualView,
-                                            IPlatformApplication.Current.Services.GetService<CameraService>());
-#elif IOS || MACCATALYST || WINDOWS
+                                            IPlatformApplication.Current.Services.GetRequiredService<CameraService>());
+#elif IOS || MACCATALYST //|| WINDOWS
+    protected override PlatformView CreatePlatformView() => new(VirtualView,
+                                                                IPlatformApplication.Current.Services.GetRequiredService<CameraService>());
+#elif WINDOWS
     protected override PlatformView CreatePlatformView() => new(VirtualView);
 #else
     protected override PlatformView CreatePlatformView() => new();
