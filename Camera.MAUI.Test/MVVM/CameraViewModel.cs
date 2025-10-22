@@ -69,8 +69,10 @@ public class CameraViewModel : INotifyPropertyChanged
         get => Cameras.Count; 
         set
         {
-            if (value > 0)
+            if (value == 1)
                 Camera = Cameras.First();
+            else if (value > 1)
+                Camera = Cameras.Skip(1).First(); // pick selfie cam by default, demo iOS fix/workaround.
         }
     }
     private MicrophoneInfo micro = null;
