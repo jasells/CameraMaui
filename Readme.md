@@ -6,14 +6,14 @@ A Camera View control and a Barcode Endode/Decode control (based on ZXing.Net) f
 <div>Latest release <a href="https://www.nuget.org/packages/XDev.CameraMaui"> <img src="https://img.shields.io/nuget/v/XDev.CameraMaui"></a></div>
 
 <div>Latest build &nbsp;&nbsp; <a href="https://www.nuget.org/packages/XDev.CameraMaui"> <img src="https://img.shields.io/nuget/vpre/XDev.CameraMaui"></a>
- &nbsp;&nbsp; status &nbsp;&nbsp; <a href="https://xdevapps.visualstudio.com/DefaultCollection/XDev.Maui/_build?definitionId=86">
-                                  <img src="https://xdevapps.visualstudio.com/DefaultCollection/XDev.Maui/_apis/build/status/XDev.CameraMaui-CI"></a>
+ &nbsp;&nbsp; status &nbsp;&nbsp; <a href="https://dev.azure.com/xdevapps/XDev.Maui/_build?definitionId=86">
+                                  <img src="https://dev.azure.com/xdevapps/XDev.Maui/_apis/build/status/XDev.CameraMaui-CI"></a>
 </div>  
 <br>
 
 source [repo](https://xdevapps.visualstudio.com/DefaultCollection/XDev.Maui/_git/XDev.Camera.Maui) 
 
-github [mirror](https://github.com/jasells/CameraMaui)  mirror sync status  [![Build status](https://xdevapps.visualstudio.com/DefaultCollection/XDev.Maui/_apis/build/status/XDev.CameraMaui%20sync%20to%20Github)](https://xdevapps.visualstudio.com/DefaultCollection/XDev.Maui/_build/latest?definitionId=90)
+github [mirror](https://github.com/jasells/CameraMaui)  mirror sync status  [![Build Status](https://dev.azure.com/xdevapps/XDev.Maui/_apis/build/status/XDev.CameraMaui%20sync%20to%20Github)](https://dev.azure.com/xdevapps/XDev.Maui/_build/latest?definitionId=90)
 
 
 
