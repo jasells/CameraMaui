@@ -17,7 +17,7 @@ github [mirror](https://github.com/jasells/CameraMaui)  mirror sync status  [![B
 
 
 
-Forked from : https://github.com/janusw/CameraMaui
+Forked from : https://github.com/janusw/CameraMaui  at v. 1.4.12
 ## CameraView
 
 A ContetView control for camera management with the next properties:
