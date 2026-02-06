@@ -1,4 +1,4 @@
-﻿#if IOS || MACCATALYST
+#if IOS || MACCATALYST
 using System;
 using System.IO;
 using AVFoundation;
@@ -84,6 +84,36 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
                 var deviceDiscoverySession = AVCaptureDeviceDiscoverySession.Create(deviceTypes, AVMediaTypes.Video, AVCaptureDevicePosition.Unspecified);
                 camDevices = deviceDiscoverySession.Devices;
                 cameraView.Cameras.Clear();
+
+                Dictionary<AVCaptureDeviceType, float> deviceTypeScales = new();
+                float virtualDeviceScale = 1.0f;
+
+                if (OperatingSystem.IsIOSVersionAtLeast(13))
+                {
+                    var virtualDevice = camDevices.FirstOrDefault(d => d.DeviceType == AVCaptureDeviceType.BuiltInTripleCamera) 
+                                        ?? camDevices.FirstOrDefault(d => d.DeviceType == AVCaptureDeviceType.BuiltInDualWideCamera);
+                    if (virtualDevice != null)
+                    {
+                        var virtualZoomFactors = new float[] { 1 }
+                            .Concat(virtualDevice.VirtualDeviceSwitchOverVideoZoomFactors.Select(n => n.FloatValue))
+                            .ToList();
+
+                        var constituentDevices = virtualDevice.ConstituentDevices.ToList();
+                        var wideAngleIndex = constituentDevices.FindIndex(d => d.DeviceType == AVCaptureDeviceType.BuiltInWideAngleCamera);
+
+                        if (wideAngleIndex >= 0)
+                        {
+                            float wideAngleZoomFactor = virtualZoomFactors[wideAngleIndex];
+
+                            for (int i = 0; i < constituentDevices.Count && i < virtualZoomFactors.Count; i++)
+                            {
+                                deviceTypeScales[constituentDevices[i].DeviceType] = virtualZoomFactors[i] / wideAngleZoomFactor;
+                            }
+                            virtualDeviceScale = 1.0f / wideAngleZoomFactor;
+                        }
+                    }
+                }
+                
                 foreach (var device in camDevices)
                 {
                     CameraPosition position = device.Position switch
@@ -91,15 +121,45 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
                         AVCaptureDevicePosition.Back => CameraPosition.Back,
                         AVCaptureDevicePosition.Front => CameraPosition.Front,
                         _ => CameraPosition.Unknown
-                    };                    
+                    };
+
+                    float zoomFactorScale;
+                    
+                    if (OperatingSystem.IsIOSVersionAtLeast(18))
+                    {
+                        zoomFactorScale = (float)device.DisplayVideoZoomFactorMultiplier;
+                    }
+                    else if (position == CameraPosition.Back)
+                    {
+                        if (device.DeviceType is AVCaptureDeviceType.BuiltInDualWideCamera or AVCaptureDeviceType.BuiltInTripleCamera)
+                        {
+                            zoomFactorScale = virtualDeviceScale;
+                        }
+                        else if (deviceTypeScales.TryGetValue(device.DeviceType, out float scale))
+                        {
+                            zoomFactorScale = scale;
+                        }
+                        else
+                        {
+                            zoomFactorScale = 1.0f;
+                        }
+                    }
+                    else
+                    {
+                        zoomFactorScale = 1.0f;
+                    }
+
+                    float minZoomFactor = (float)device.MinAvailableVideoZoomFactor * zoomFactorScale;
+                    float maxZoomFactor = (float)device.MaxAvailableVideoZoomFactor * zoomFactorScale;
+                    
                     cameraView.Cameras.Add(new CameraInfo
                     {
                         Name = device.LocalizedName,
                         DeviceId = device.UniqueID,
                         Position = position,
                         HasFlashUnit = device.FlashAvailable,
-                        MinZoomFactor = (float)device.MinAvailableVideoZoomFactor,
-                        MaxZoomFactor = (float)device.MaxAvailableVideoZoomFactor,
+                        MinZoomFactor = minZoomFactor,
+                        MaxZoomFactor = maxZoomFactor,
                         HorizontalViewAngle = device.ActiveFormat.VideoFieldOfView * MathF.PI / 180,
                         AvailableResolutions = new() { new(1920, 1080), new(1280, 720), new(640, 480), new(352, 288) }
                     });
@@ -330,7 +390,8 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
             captureDevice.LockForConfiguration(out NSError error);
             if (error == null)
             {
-                captureDevice.VideoZoomFactor = Math.Clamp(zoom, cameraView.Camera.MinZoomFactor, cameraView.Camera.MaxZoomFactor);
+                float clampedZoom = Math.Clamp(zoom, cameraView.Camera.MinZoomFactor, cameraView.Camera.MaxZoomFactor) / cameraView.Camera.MinZoomFactor;
+                captureDevice.VideoZoomFactor = clampedZoom;
                 captureDevice.UnlockForConfiguration();
             }
         }
