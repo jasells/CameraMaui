@@ -1,4 +1,6 @@
-ï»¿#if IOS || MACCATALYST
+#if IOS || MACCATALYST
+using System;
+using System.IO;
 using AVFoundation;
 using CoreAnimation;
 using CoreFoundation;
@@ -8,7 +10,6 @@ using CoreMedia;
 using CoreVideo;
 using Foundation;
 using MediaPlayer;
-using System.IO;
 using UIKit;
 
 namespace Camera.MAUI.Platforms.Apple;
@@ -121,7 +122,7 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
         uint index = (uint)Math.Round(angle / 90.0f) % 4u;
         int deviceOrientation = degrees[index];
 
-        Debug.WriteLine($"Device orientation angle: {angle:F2}Â°, mapped: {deviceOrientation}Â°");
+        Debug.WriteLine($"Device orientation angle: {angle:F2}°, mapped: {deviceOrientation}°");
 
         // Return the mapped degrees for use as orientation hint for camera when recording
         return deviceOrientation;
@@ -145,6 +146,36 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
                 var deviceDiscoverySession = AVCaptureDeviceDiscoverySession.Create(deviceTypes, AVMediaTypes.Video, AVCaptureDevicePosition.Unspecified);
                 camDevices = deviceDiscoverySession.Devices;
                 cameraView.Cameras.Clear();
+
+                Dictionary<AVCaptureDeviceType, float> deviceTypeScales = new();
+                float virtualDeviceScale = 1.0f;
+
+                if (OperatingSystem.IsIOSVersionAtLeast(13))
+                {
+                    var virtualDevice = camDevices.FirstOrDefault(d => d.DeviceType == AVCaptureDeviceType.BuiltInTripleCamera) 
+                                        ?? camDevices.FirstOrDefault(d => d.DeviceType == AVCaptureDeviceType.BuiltInDualWideCamera);
+                    if (virtualDevice != null)
+                    {
+                        var virtualZoomFactors = new float[] { 1 }
+                            .Concat(virtualDevice.VirtualDeviceSwitchOverVideoZoomFactors.Select(n => n.FloatValue))
+                            .ToList();
+
+                        var constituentDevices = virtualDevice.ConstituentDevices.ToList();
+                        var wideAngleIndex = constituentDevices.FindIndex(d => d.DeviceType == AVCaptureDeviceType.BuiltInWideAngleCamera);
+
+                        if (wideAngleIndex >= 0)
+                        {
+                            float wideAngleZoomFactor = virtualZoomFactors[wideAngleIndex];
+
+                            for (int i = 0; i < constituentDevices.Count && i < virtualZoomFactors.Count; i++)
+                            {
+                                deviceTypeScales[constituentDevices[i].DeviceType] = virtualZoomFactors[i] / wideAngleZoomFactor;
+                            }
+                            virtualDeviceScale = 1.0f / wideAngleZoomFactor;
+                        }
+                    }
+                }
+                
                 foreach (var device in camDevices)
                 {
                     CameraPosition position = device.Position switch
@@ -152,15 +183,45 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
                         AVCaptureDevicePosition.Back => CameraPosition.Back,
                         AVCaptureDevicePosition.Front => CameraPosition.Front,
                         _ => CameraPosition.Unknown
-                    };                    
+                    };
+
+                    float zoomFactorScale;
+                    
+                    if (OperatingSystem.IsIOSVersionAtLeast(18))
+                    {
+                        zoomFactorScale = (float)device.DisplayVideoZoomFactorMultiplier;
+                    }
+                    else if (position == CameraPosition.Back)
+                    {
+                        if (device.DeviceType is AVCaptureDeviceType.BuiltInDualWideCamera or AVCaptureDeviceType.BuiltInTripleCamera)
+                        {
+                            zoomFactorScale = virtualDeviceScale;
+                        }
+                        else if (deviceTypeScales.TryGetValue(device.DeviceType, out float scale))
+                        {
+                            zoomFactorScale = scale;
+                        }
+                        else
+                        {
+                            zoomFactorScale = 1.0f;
+                        }
+                    }
+                    else
+                    {
+                        zoomFactorScale = 1.0f;
+                    }
+
+                    float minZoomFactor = (float)device.MinAvailableVideoZoomFactor * zoomFactorScale;
+                    float maxZoomFactor = (float)device.MaxAvailableVideoZoomFactor * zoomFactorScale;
+                    
                     cameraView.Cameras.Add(new CameraInfo
                     {
                         Name = device.LocalizedName,
                         DeviceId = device.UniqueID,
                         Position = position,
                         HasFlashUnit = device.FlashAvailable,
-                        MinZoomFactor = (float)device.MinAvailableVideoZoomFactor,
-                        MaxZoomFactor = (float)device.MaxAvailableVideoZoomFactor,
+                        MinZoomFactor = minZoomFactor,
+                        MaxZoomFactor = maxZoomFactor,
                         HorizontalViewAngle = device.ActiveFormat.VideoFieldOfView * MathF.PI / 180,
                         AvailableResolutions = new() { new(1920, 1080), new(1280, 720), new(640, 480), new(352, 288) },
                         //default the front camera to mirrored
@@ -219,14 +280,36 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
                         captureSession.AddOutput(recordOutput);
 
                         var movieFileOutputConnection = recordOutput.Connections[0];
-                        //movieFileOutputConnection.VideoOrientation = (AVCaptureVideoOrientation)UIDevice.CurrentDevice.Orientation;
-                        movieFileOutputConnection.VideoOrientation = _deviceOrientation;
-
-                        // **todo: check the obsolete warnings here, maybe related?
-                        Debug.WriteLine($"==== iOS VideoOrientation: {movieFileOutputConnection.VideoOrientation}");
-                        Debug.WriteLine($"==== Maui Orientation: {DeviceDisplay.Current.MainDisplayInfo.Orientation}");
-                        Debug.WriteLine($"==== Device orientation: {_camService.DeviceOrientationAngle}");
-
+                        
+                        // Use VideoRotationAngle on iOS 17.0+ and Mac Catalyst 17.0+ to avoid CA1422 warning
+                        // VideoOrientation is deprecated on iOS 17.0 and Mac Catalyst 17.0 and later
+                        bool useVideoRotationAngle = false;
+#if IOS
+                        useVideoRotationAngle = OperatingSystem.IsIOSVersionAtLeast(17);
+#elif MACCATALYST
+                        useVideoRotationAngle = OperatingSystem.IsMacCatalystVersionAtLeast(17);
+#endif
+                        if (useVideoRotationAngle)
+                        {
+                            // Map UIDeviceOrientation to rotation angle
+                            // VideoRotationAngle uses clockwise rotation in degrees
+                            // For back camera, landscape orientations need to be inverted
+                            var deviceOrientation = UIDevice.CurrentDevice.Orientation;
+                            var isBackCamera = cameraView.Camera?.Position == CameraPosition.Back;
+                            movieFileOutputConnection.VideoRotationAngle = deviceOrientation switch
+                            {
+                                UIDeviceOrientation.Portrait => 90,
+                                UIDeviceOrientation.PortraitUpsideDown => 270,
+                                UIDeviceOrientation.LandscapeRight => isBackCamera ? 180 : 0,
+                                UIDeviceOrientation.LandscapeLeft => isBackCamera ? 0 : 180,
+                                _ => 90 // Default to portrait for unknown orientations
+                            };
+                        }
+                        else
+                        {
+                            movieFileOutputConnection.VideoOrientation = (AVCaptureVideoOrientation)UIDevice.CurrentDevice.Orientation;
+                        }
+                        
                         captureSession.StartRunning();
 
                         //Below was causing issues on .net 8
@@ -371,7 +454,8 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
             captureDevice.LockForConfiguration(out NSError error);
             if (error == null)
             {
-                captureDevice.VideoZoomFactor = Math.Clamp(zoom, cameraView.Camera.MinZoomFactor, cameraView.Camera.MaxZoomFactor);
+                float clampedZoom = Math.Clamp(zoom, cameraView.Camera.MinZoomFactor, cameraView.Camera.MaxZoomFactor) / cameraView.Camera.MinZoomFactor;
+                captureDevice.VideoZoomFactor = clampedZoom;
                 captureDevice.UnlockForConfiguration();
             }
         }
@@ -569,6 +653,7 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
             result = false;
         return result;
     }
+
     public UIImage CropImage(UIImage originalImage)
     {
         nfloat x, y, width, height;
@@ -587,16 +672,19 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
         x = (nfloat)((originalImage.Size.Width - width) / 2.0);
         y = (nfloat)((originalImage.Size.Height - height) / 2.0);
 
-        UIGraphics.BeginImageContextWithOptions(originalImage.Size, false, 1);
-        if (cameraView.Camera?.IsMirrored == true)
-        {
-            var context = UIGraphics.GetCurrentContext();
-            context.ScaleCTM(-1, 1);
-            context.TranslateCTM(-originalImage.Size.Width, 0);
-        }
-        originalImage.Draw(new CGPoint(0, 0));
-        UIImage croppedImage = UIImage.FromImage(UIGraphics.GetImageFromCurrentImageContext().CGImage.WithImageInRect(new CGRect(new CGPoint(x, y), new CGSize(width, height))));
-        UIGraphics.EndImageContext();
+        var renderer = new UIGraphicsImageRenderer(originalImage.Size, new UIGraphicsImageRendererFormat { Opaque = false, Scale = 1});
+
+        var image = renderer.CreateImage(imageContext => {
+            if (cameraView.MirroredImage)
+            {
+                var context = imageContext.CGContext;
+                context.ScaleCTM(-1, 1);
+                context.TranslateCTM(-originalImage.Size.Width, 0);
+            }
+            originalImage.Draw(new CGPoint(0, 0));
+        });
+
+        UIImage croppedImage = UIImage.FromImage(image.CGImage.WithImageInRect(new CGRect(new CGPoint(x, y), new CGSize(width, height))));
 
         return croppedImage;
     }
@@ -673,18 +761,41 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
             sampleBuffer?.Dispose();
         }
     }
-    [Export("captureOutput:didFinishProcessingPhotoSampleBuffer:previewPhotoSampleBuffer:resolvedSettings:bracketSettings:error:")]
-    void DidFinishProcessingPhoto(AVCapturePhotoOutput captureOutput, CMSampleBuffer photoSampleBuffer, CMSampleBuffer previewPhotoSampleBuffer, AVCaptureResolvedPhotoSettings resolvedSettings, AVCaptureBracketedStillImageSettings bracketSettings, NSError error)
+
+    [Export("captureOutput:didFinishProcessingPhoto:error:")]
+    void DidFinishProcessingPhoto(AVCapturePhotoOutput output, AVCapturePhoto capPhoto, NSError error)
     {
-        if (photoSampleBuffer == null)
+        // Handle error or missing photo to avoid null reference and unblock waiting code.
+        if (error != null || capPhoto == null)
         {
+            photo = null;
             photoError = true;
+            photoTaken = false;
             return;
         }
 
-        NSData imageData = AVCapturePhotoOutput.GetJpegPhotoDataRepresentation(photoSampleBuffer, previewPhotoSampleBuffer);
-        photo = new UIImage(imageData);
-        photoTaken = true;
+        var data = capPhoto.FileDataRepresentation;
+        if (data == null)
+        {
+            photo = null;
+            photoError = true;
+            photoTaken = false;
+            return;
+        }
+
+        try
+        {
+            photo = new UIImage(data);
+            photoError = false;
+            photoTaken = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+            photo = null;
+            photoError = true;
+            photoTaken = false;
+        }
     }
 
     private void UpdateTransform()
@@ -693,12 +804,24 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
         if (cameraView.Camera?.IsMirrored == true)
             transform = transform.Scale(-1, 1, 1);
 
-        UIInterfaceOrientation orientation;
-        if (OperatingSystem.IsIOSVersionAtLeast(15))
-            orientation = (UIApplication.SharedApplication.ConnectedScenes.ToArray().First(s => s is UIWindowScene) as UIWindowScene).InterfaceOrientation;
-        else if (OperatingSystem.IsIOSVersionAtLeast(13))
-            orientation = UIApplication.SharedApplication.Windows.First().WindowScene.InterfaceOrientation;
-        else
+        UIInterfaceOrientation orientation = UIInterfaceOrientation.Unknown;
+        if (OperatingSystem.IsIOSVersionAtLeast(13))
+        {
+            UIWindowScene windowScene = null;
+            if (OperatingSystem.IsIOSVersionAtLeast(15))
+                windowScene = UIApplication.SharedApplication.ConnectedScenes.ToArray().FirstOrDefault(s => s is UIWindowScene) as UIWindowScene;
+            else
+                windowScene = UIApplication.SharedApplication.Windows.FirstOrDefault()?.WindowScene;
+            
+            if (windowScene != null)
+            {
+                // if (OperatingSystem.IsIOSVersionAtLeast(26))
+                //     orientation = windowScene.EffectiveGeometry.InterfaceOrientation;
+                // else
+                orientation = windowScene.InterfaceOrientation;
+            }
+        }
+        if (orientation == UIInterfaceOrientation.Unknown)
             orientation = UIApplication.SharedApplication.StatusBarOrientation;
 
         switch (orientation)

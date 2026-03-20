@@ -45,8 +45,8 @@
                     <CheckBox BindingContext="{x:Reference cameraView}" x:DataType="cv:CameraView" IsChecked="{Binding AutoSnapShotAsImageSource}" VerticalOptions="Center" Color="Black"/>
                 </HorizontalStackLayout>
                 <HorizontalStackLayout HorizontalOptions="Center" Margin="2" Spacing="2">
-                    <Label Text="Zoom" VerticalOptions="Center" TextColor="Black"/>
-                    <Stepper BindingContext="{x:Reference cameraView}" x:DataType="cv:CameraView" Minimum="{Binding MinZoomFactor}" Maximum="7" Increment="0.5" Value="{Binding ZoomFactor,Mode=TwoWay}" />
+                    <Label BindingContext="{x:Reference cameraView}" x:DataType="cv:CameraView" Text="{Binding ZoomFactor, StringFormat='Zoom: {0:F2}'}" VerticalOptions="Center" TextColor="Black"/>
+                    <Slider BindingContext="{x:Reference cameraView}" x:DataType="cv:CameraView" Minimum="{Binding MinZoomFactor}" Maximum="{Binding MaxZoomFactor}" Value="{Binding ZoomFactor,Mode=TwoWay}" WidthRequest="320" />
                 </HorizontalStackLayout>
                 <HorizontalStackLayout HorizontalOptions="Center" Margin="5">
                     <Button Text="Start Camera" Command="{Binding StartCamera}" />
