@@ -69,7 +69,14 @@ public class CameraViewModel : INotifyPropertyChanged
         get => Cameras.Count; 
         set
         {
-            if (value > 0)
+            // I think this is source of Anroid initial cam cycle on Android.
+            // not sure how to better fix that issue, for now.
+            // confirmed: adding this to condition below
+            // will stop the camera from loading on start, and avoid the race:
+            // && DeviceInfo.Current.Platform == DevicePlatform.iOS
+            //**todo: this needs to move _After_ the Page.OnAppearing to avoid issues
+            // causing camera/preview when started too early (page not onscreen yet).
+            if (value > 0 ) 
                 Camera = Cameras.First();
         }
     }

@@ -18,6 +18,8 @@ using Android.Renderscripts;
 using RectF = Android.Graphics.RectF;
 using Android.Content.Res;
 using DebugOut = System.Diagnostics.Debug;
+using IntelliJ.Lang.Annotations;
+using Stopwatch = System.Diagnostics.Stopwatch;
 
 namespace Camera.MAUI.Platforms.Android;
 
@@ -276,48 +278,91 @@ internal class MauiCameraView : GridLayout
 
     private async void StartPreview()
     {
+        DebugOut.WriteLine("Starting camera preview...");
         while (textureView.SurfaceTexture == null)
         {
-            await Task.Delay(100);
+            await Task.Delay(20);
         }
         SurfaceTexture texture = textureView.SurfaceTexture;
         texture.SetDefaultBufferSize(videoSize.Width, videoSize.Height);
 
-        previewBuilder = cameraDevice.CreateCaptureRequest(recording ? CameraTemplate.Record : CameraTemplate.Preview);
         var surfaces = new List<OutputConfiguration>();
         var surfaces26 = new List<Surface>();
         var previewSurface = new Surface(texture);
         surfaces.Add(new OutputConfiguration(previewSurface));
         surfaces26.Add(previewSurface);
-        previewBuilder.AddTarget(previewSurface);
-        if (imgReader != null)
+
+        // we have a race condition where the camera is getting cycled rapidly sometimes,
+        // so we need to check here that the camera is still open before starting the session,
+        // otherwise we can get a crash
+        //  If we know what is causing the rapid cycling on first run we can probably fix that
+        //  and remove this check and delay, but in the meantime this should prevent the crash
+        //  and the delay should be short enough to not cause a noticeable issue.
+        // note: testing on Gal-s25FE showed that the time to cycle on and back off was ~100ms on this first-run cycling issue.
+        if(hasSuccess == false) await Task.Delay(250);
+        if (stateListener._cameraOpen == false) return;
+        DebugOut.WriteLine("Starting camera capture session...");
+
+        try
         {
-            surfaces.Add(new OutputConfiguration(imgReader.Surface));
-            surfaces26.Add(imgReader.Surface);
+            //imgReader gets cycled too if camera is cycled, so we need to wait until here to de-ref it too.
+            if (imgReader != null)
+            {
+                surfaces.Add(new OutputConfiguration(imgReader.Surface));
+                surfaces26.Add(imgReader.Surface);
+            }
+            if (mediaRecorder != null)
+            {
+                surfaces.Add(new OutputConfiguration(mediaRecorder.Surface));
+                surfaces26.Add(mediaRecorder.Surface);
+            }
+            // CANNOT create the builder UNTIL we're sure the camera is started and won't be 
+            //cycled WHILE we're doing setup, otherwise we can get a crash due to the builder
+            //trying to access the camera which may be in the process of closing or already closed.
+            previewBuilder = cameraDevice.CreateCaptureRequest(recording ? CameraTemplate.Record : CameraTemplate.Preview);
+            previewBuilder.AddTarget(previewSurface);
+
+            if (mediaRecorder != null)
+            {
+                previewBuilder.AddTarget(mediaRecorder.Surface);
+            }
+            sessionCallback = new PreviewCaptureStateCallback(this);
+            if (OperatingSystem.IsAndroidVersionAtLeast(28))
+            {
+                SessionConfiguration config = new((int)SessionType.Regular, surfaces, CameraExecutor, sessionCallback);
+                cameraDevice?.CreateCaptureSession(config);
+            }
+            else
+            {
+#pragma warning disable CS0618 // El tipo o el miembro están obsoletos
+                cameraDevice?.CreateCaptureSession(surfaces26, sessionCallback, null);
+#pragma warning restore CS0618 // El tipo o el miembro están obsoletos
+            }
         }
-        if (mediaRecorder != null)
+        catch (CameraAccessException e)
         {
-            surfaces.Add(new OutputConfiguration(mediaRecorder.Surface));
-            surfaces26.Add(mediaRecorder.Surface);
-            previewBuilder.AddTarget(mediaRecorder.Surface);
+            e.PrintStackTrace();
+            global::Android.Util.Log.Error("====Camera error:", $"{cameraDevice?.Id ?? "null"}, error code: {e}");
+        }
+        catch (Java.Lang.Exception e)
+        {
+            e.PrintStackTrace();
+            global::Android.Util.Log.Error("====Camera error:", $"{cameraDevice?.Id ?? "null"}, error code: {e}");
+        }
+        catch (Exception e)
+        {
+            new Java.Lang.Exception(e.ToString()).PrintStackTrace();
+            global::Android.Util.Log.Error("====Camera error:", $"{cameraDevice?.Id ?? "null"}, error code: {e}");
         }
 
-        sessionCallback = new PreviewCaptureStateCallback(this);
-        if (OperatingSystem.IsAndroidVersionAtLeast(28))
-        {
-            SessionConfiguration config = new((int)SessionType.Regular, surfaces, CameraExecutor, sessionCallback);
-            cameraDevice.CreateCaptureSession(config);
-        }
-        else
-        {
-#pragma warning disable CS0618 // El tipo o el miembro están obsoletos
-            cameraDevice.CreateCaptureSession(surfaces26, sessionCallback, null);
-#pragma warning restore CS0618 // El tipo o el miembro están obsoletos
-        }
+        hasSuccess = true;
     }
+
+    bool hasSuccess = false;
+
     private void UpdatePreview()
     {
-        if (null == cameraDevice)
+        if (null == cameraDevice || stateListener._cameraOpen == false)
             return;
 
         try
@@ -716,7 +761,8 @@ internal class MauiCameraView : GridLayout
             {
                 previewBuilder.Set(CaptureRequest.ControlAeMode, (int)ControlAEMode.On);
                 previewBuilder.Set(CaptureRequest.FlashMode, cameraView.TorchEnabled ? (int)ControlAEMode.OnAutoFlash : (int)ControlAEMode.Off);
-                previewSession.SetRepeatingRequest(previewBuilder.Build(), null, null);
+                //previewSession.SetRepeatingRequest(previewBuilder.Build(), null, null);
+                SafeSetRepeatingRequest(backgroundHandler);
             }
             else if (initiated)
                 cameraManager.SetTorchMode(cameraView.Camera.DeviceId, cameraView.TorchEnabled);
@@ -734,15 +780,18 @@ internal class MauiCameraView : GridLayout
                     {
                         case FlashMode.Auto:
                             previewBuilder.Set(CaptureRequest.ControlAeMode, (int)ControlAEMode.OnAutoFlash);
-                            previewSession.SetRepeatingRequest(previewBuilder.Build(), null, null);
+                            //previewSession.SetRepeatingRequest(previewBuilder.Build(), null, null);
+                            SafeSetRepeatingRequest(backgroundHandler);
                             break;
                         case FlashMode.Enabled:
                             previewBuilder.Set(CaptureRequest.ControlAeMode, (int)ControlAEMode.On);
-                            previewSession.SetRepeatingRequest(previewBuilder.Build(), null, null);
+                            //previewSession.SetRepeatingRequest(previewBuilder.Build(), null, null);
+                            SafeSetRepeatingRequest(backgroundHandler);
                             break;
                         case FlashMode.Disabled:
                             previewBuilder.Set(CaptureRequest.ControlAeMode, (int)ControlAEMode.Off);
-                            previewSession.SetRepeatingRequest(previewBuilder.Build(), null, null);
+                            //previewSession.SetRepeatingRequest(previewBuilder.Build(), null, null);
+                            SafeSetRepeatingRequest(backgroundHandler);
                             break;
                     }
                 }
@@ -752,6 +801,37 @@ internal class MauiCameraView : GridLayout
             }
         }
     }
+
+    // safe helper to set repeating request
+    void SafeSetRepeatingRequest(Handler? previewHandler = null)
+    {
+        // quick null checks
+        if (previewSession == null || previewBuilder == null) return;
+
+
+        // check our flag under lock to avoid races
+        lock (stateListener._cameraLock)
+        {
+            if (!stateListener._cameraOpen) return;
+        }
+
+        try
+        {
+            previewSession.SetRepeatingRequest(previewBuilder.Build(), null, previewHandler);
+        }
+        catch (Java.Lang.IllegalStateException ex)
+        {
+            // camera already closed or session invalid — log and ignore
+            DebugOut.WriteLine($"=====Warn: Camera state issue: {ex.Message}");
+            global::Android.Util.Log.Warn("MauiCameraView", $"Ignored SetRepeatingRequest: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            DebugOut.WriteLine($"=====Warn: Camera state issue: {ex.Message}");
+            global::Android.Util.Log.Error("MauiCameraView", $"Unexpected camera error: {ex}");
+        }
+    }
+
     internal void SetZoomFactor(float zoom)
     {
         if (previewSession != null && previewBuilder != null && cameraView.Camera != null)
@@ -768,19 +848,22 @@ internal class MauiCameraView : GridLayout
             int newHeight = (int)(m.Height() - (minH * destZoom));
             Rect zoomArea = new((m.Width() - newWidth) / 2, (m.Height() - newHeight) / 2, newWidth, newHeight);
             previewBuilder.Set(CaptureRequest.ScalerCropRegion, zoomArea);
-            previewSession.SetRepeatingRequest(previewBuilder.Build(), null, null);
+            //previewSession.SetRepeatingRequest(previewBuilder.Build(), null, null);
+            SafeSetRepeatingRequest(backgroundHandler);
         }
     }
     internal void ForceAutoFocus()
     {
         if (previewSession != null && previewBuilder != null && cameraView.Camera != null)
         {
-            previewBuilder.Set(CaptureRequest.ControlAfMode, Java.Lang.Integer.ValueOf((int)ControlAFMode.Off));
-            previewBuilder.Set(CaptureRequest.ControlAfTrigger, Java.Lang.Integer.ValueOf((int)ControlAFTrigger.Cancel));
-            previewSession.SetRepeatingRequest(previewBuilder.Build(), null, null);
+            //previewBuilder.Set(CaptureRequest.ControlAfMode, Java.Lang.Integer.ValueOf((int)ControlAFMode.Off));
+            //previewBuilder.Set(CaptureRequest.ControlAfTrigger, Java.Lang.Integer.ValueOf((int)ControlAFTrigger.Cancel));
+            ////previewSession.SetRepeatingRequest(previewBuilder.Build(), null, null);
+            //SafeSetRepeatingRequest(backgroundHandler);
             previewBuilder.Set(CaptureRequest.ControlAfMode, Java.Lang.Integer.ValueOf((int)ControlAFMode.Auto));
             previewBuilder.Set(CaptureRequest.ControlAfTrigger, Java.Lang.Integer.ValueOf((int)ControlAFTrigger.Start));
-            previewSession.SetRepeatingRequest(previewBuilder.Build(), null, null);
+            //previewSession.SetRepeatingRequest(previewBuilder.Build(), null, null);
+            SafeSetRepeatingRequest(backgroundHandler);
 
         }
     }
@@ -935,36 +1018,73 @@ internal class MauiCameraView : GridLayout
     private class MyCameraStateCallback : CameraDevice.StateCallback
     {
         private readonly MauiCameraView cameraView;
+        private readonly Stopwatch _sw;
+        internal volatile bool _cameraOpen = false;
+        internal object _cameraLock = new object();
+
         public MyCameraStateCallback(MauiCameraView camView)
         {
             cameraView = camView;
+            _sw = new Stopwatch();
+            _sw.Start();
         }
         public override void OnOpened(CameraDevice camera)
         {
-            if (camera != null)
+            DebugOut.WriteLine($"====Camera opened: {camera?.Id ?? "null"}, in :{_sw.ElapsedMilliseconds}");
+            _sw.Restart();
+            lock (_cameraLock)
             {
-                cameraView.cameraDevice = camera;
-                cameraView.StartPreview();
+                if (camera != null && _cameraOpen == false)
+                {
+                    _cameraOpen = true;
+                    cameraView.cameraDevice = camera;
+                    cameraView.StartPreview();
+                }
             }
         }
 
         public override void OnClosed(CameraDevice camera)
         {
-            cameraView.executorService?.Shutdown();
-            cameraView.executorService?.Dispose();
-            cameraView.executorService = null; // so we can tell if we need a new one?
+            DebugOut.WriteLine($"====Camera closed: {camera?.Id ?? "null"}, in :{_sw.ElapsedMilliseconds}");
+            _sw.Restart();
+            if (_cameraOpen == false) return; // already closed, ignore
+            _cameraOpen = false;
+
+            lock (_cameraLock)
+            {
+                cameraView.executorService?.Shutdown();
+                cameraView.executorService?.Dispose();
+                cameraView.executorService = null; // so we can tell if we need a new one?
+            }
         }
 
         public override void OnDisconnected(CameraDevice camera)
         {
-            camera.Close();
-            cameraView.cameraDevice = null;
+            DebugOut.WriteLine($"====Camera disconnected: {camera?.Id ?? "null"}, in :{_sw.ElapsedMilliseconds}");
+            _sw.Restart();
+
+            if (_cameraOpen == false) return; // already closed, ignore
+
+            _cameraOpen = false;
+
+            lock (_cameraLock)
+            {
+                camera?.Close();
+                cameraView.cameraDevice = null;
+            }
         }
 
         public override void OnError(CameraDevice camera, CameraError error)
         {
-            camera?.Close();
-            cameraView.cameraDevice = null;
+            DebugOut.WriteLine($"====Camera error: {camera?.Id ?? "null"}, error code: {error}, in :{_sw.ElapsedMilliseconds}");
+            global::Android.Util.Log.Error("====Camera error:", $"{camera?.Id ?? "null"}, error code: {error}");
+            _sw.Restart();
+            lock (_cameraLock)
+            {
+                if (_cameraOpen == false) return; // already closed, ignore
+                camera?.Close();
+                cameraView.cameraDevice = null;
+            }
         }
     }
 
