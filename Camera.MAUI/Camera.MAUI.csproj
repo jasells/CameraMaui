@@ -20,11 +20,17 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Title>Camera and Barcode encode/decode pluging for .NET MAUI Apps</Title>
 		<Description>A Camera View control and a Barcode Endode/Decode control (based on ZXing.Net) for .NET MAUI applications.</Description>
-    <PackageReleaseNotes>
+		<PackageReleaseNotes>
 
-      - Cameras' mirrored state now tracks the camera and is reflected in the CameraView.MirroredImage property, as well as CameraInfo.IsMirrored and can be changed by either object, see readme for more details.
-    </PackageReleaseNotes>
-    <Copyright></Copyright>
+			- Cameras' mirrored state now tracks the camera and is reflected in the CameraView.MirroredImage property, as well as CameraInfo.IsMirrored and can be changed by either object, see readme for more details.
+			- Android fixed several race conditions regarding starting/stopping cameras that caused various crashes:
+				- https://xdevapps.visualstudio.com/XDev.Maui/_workitems/edit/172
+				- https://github.com/janusw/CameraMaui/issues/47
+				- https://github.com/jasells/CameraMaui/issues/1
+			
+			
+		</PackageReleaseNotes>
+		<Copyright></Copyright>
 		<PackageId>XDev.CameraMaui</PackageId>
 		<PackageProjectUrl>https://xdevapps.visualstudio.com/DefaultCollection/XDev.Maui/_git/XDev.Camera.Maui</PackageProjectUrl>
 		<PackageIcon>camera.maui.png</PackageIcon>
@@ -38,10 +44,10 @@
 		<Version>1.4.12</Version>
 		<Nullable>annotations</Nullable>
 
-    <!--support source-link-->
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>
-      $(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb
-    </AllowedOutputExtensionsInPackageBuildOutputFolder>
+		<!--support source-link-->
+		<AllowedOutputExtensionsInPackageBuildOutputFolder>
+			$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb
+		</AllowedOutputExtensionsInPackageBuildOutputFolder>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('net9'))">
@@ -49,21 +55,21 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Folder Include="Platforms\iOS\" />
-	  <Folder Include="Platforms\MacCatalyst\" />
-	  <Folder Include="Platforms\Tizen\" />
+		<Folder Include="Platforms\iOS\" />
+		<Folder Include="Platforms\MacCatalyst\" />
+		<Folder Include="Platforms\Tizen\" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Include="camera.maui.png">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
-	  <None Include="..\.editorconfig" Link=".editorconfig" />
-	  <None Include="..\Readme.md">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
+		<None Include="camera.maui.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="..\.editorconfig" Link=".editorconfig" />
+		<None Include="..\Readme.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -73,22 +79,22 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="BarcodeImage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
+		<MauiXaml Update="BarcodeImage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 	</ItemGroup>
 
-  <!-- Make sure any old temp files are removed-->
-  <Target Name="CustomClean" AfterTargets="Clean" Condition="$([MSBuild]::IsOSPlatform('Windows'))">
-    <Message Text="Running custom clean up... $(ProjectDir)bin" />
-    <Exec Command="rmdir /s /q $(ProjectDir)bin" />
-    <Message Text="Running custom clean up... $(ProjectDir)obj" />
-    <Exec Command="rmdir /s /q $(ProjectDir)obj" />
-  </Target>
-  <Target Name="CustomCleanMac" AfterTargets="Clean" Condition="$([MSBuild]::IsOSPlatform('OSX'))">
-    <Message Text="Running custom clean up... $(ProjectDir)bin" />
-    <Exec Command="rm -R $(ProjectDir)bin" ContinueOnError="true" />
-    <Message Text="Running custom clean up... $(ProjectDir)obj" />
-    <Exec Command="rm -R $(ProjectDir)obj" ContinueOnError="true" />
-  </Target>
+	<!-- Make sure any old temp files are removed-->
+	<Target Name="CustomClean" AfterTargets="Clean" Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+		<Message Text="Running custom clean up... $(ProjectDir)bin" />
+		<Exec Command="rmdir /s /q $(ProjectDir)bin" />
+		<Message Text="Running custom clean up... $(ProjectDir)obj" />
+		<Exec Command="rmdir /s /q $(ProjectDir)obj" />
+	</Target>
+	<Target Name="CustomCleanMac" AfterTargets="Clean" Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+		<Message Text="Running custom clean up... $(ProjectDir)bin" />
+		<Exec Command="rm -R $(ProjectDir)bin" ContinueOnError="true" />
+		<Message Text="Running custom clean up... $(ProjectDir)obj" />
+		<Exec Command="rm -R $(ProjectDir)obj" ContinueOnError="true" />
+	</Target>
 </Project>
