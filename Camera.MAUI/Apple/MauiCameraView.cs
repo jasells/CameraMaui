@@ -541,13 +541,7 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
                 {
                     var ciContext = new CIContext();
                     CGImage cgImage = ciContext.CreateCGImage(lastCapture, lastCapture.Extent);
-                    UIImageOrientation orientation = UIDevice.CurrentDevice.Orientation switch
-                    {
-                        UIDeviceOrientation.LandscapeRight => UIImageOrientation.Down,
-                        UIDeviceOrientation.LandscapeLeft => UIImageOrientation.Up,
-                        UIDeviceOrientation.PortraitUpsideDown => UIImageOrientation.Left,
-                        _ => UIImageOrientation.Right
-                    };
+                    UIImageOrientation orientation = DetermineImageOrientation();
                     var image = UIImage.FromImage(cgImage, UIScreen.MainScreen.Scale, orientation);
                     var image2 = CropImage(image);
                     //MemoryStream stream = new();
@@ -561,7 +555,7 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
                             break;
                     }
                     stream.Position = 0;
-                       
+
                 }
             }
             catch
@@ -570,6 +564,30 @@ internal class MauiCameraView : UIView, IAVCaptureVideoDataOutputSampleBufferDel
         }).Wait();
 
         return stream;
+    }
+
+    private UIImageOrientation DetermineImageOrientation()
+    {
+        if (cameraView.Camera.Position == CameraPosition.Back)
+        {
+            return UIDevice.CurrentDevice.Orientation switch
+            {
+                UIDeviceOrientation.LandscapeRight => UIImageOrientation.Down,
+                UIDeviceOrientation.LandscapeLeft => UIImageOrientation.Up,
+                UIDeviceOrientation.PortraitUpsideDown => UIImageOrientation.Left,
+                _ => UIImageOrientation.Right
+            };
+        }
+        else // front cam requires different orientation, or will be upside down sometimes
+        {
+            return UIDevice.CurrentDevice.Orientation switch
+            {
+                UIDeviceOrientation.LandscapeRight => UIImageOrientation.Up,
+                UIDeviceOrientation.LandscapeLeft => UIImageOrientation.Down,
+                UIDeviceOrientation.PortraitUpsideDown => UIImageOrientation.Left,
+                _ => UIImageOrientation.Right
+            };
+        }
     }
 
     public Stream GetSnapShotStream(ImageFormat imageFormat)
